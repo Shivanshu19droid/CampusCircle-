@@ -1,12 +1,14 @@
 //after defining the user model, we also define the related functions like - generatign web tokens, comparing passwords, hashing passwords so that they can directly be called inside the controllers
 
 import { Schema, model} from 'mongoose';
-import bcrypt from 'bcrypt.js';
+import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { config } from 'dotenv';
 config();
-import crypto from 'crpto';
+import crypto from 'crypto';
 import {type} from 'os';
+import mongoose from 'mongoose';
+
 
 //creating the user schema
 
@@ -57,7 +59,7 @@ const userSchema = new Schema(
             maxLength: 200,
             default: ""
         },
-        skills: [string], //array of strings
+        skills: [String], //array of strings
         links: {
             github: String,
             linkedIn: String,

@@ -3,7 +3,7 @@ import DbConnection from "./config/DbConnection.js";
 import cloudinary from "cloudinary";
 import dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config({quiet: true});
 
 const PORT = process.env.PORT || 5000;
 
@@ -11,11 +11,15 @@ const PORT = process.env.PORT || 5000;
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
-    api_Secret: process.env.CLOUDINARY_API_SECRET
+    api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-app.listen(async() => {
-    await DbConnection();
-    console.log(`Server is running on port ${PORT}`);
+app.listen(PORT, async() => {
+    try{
+         await DbConnection();
+        console.log(`app is running on port ${PORT}`);
+    } catch(error){
+        console.log(error);
+    }
 })
 
