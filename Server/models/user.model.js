@@ -70,6 +70,10 @@ const userSchema = new Schema(
             enum: ["ADMIN", "ALUMNI", "STUDENT"],
             default: "STUDENT"
         },
+        batch: {
+            type: String,
+            default: "2025"
+        },
         forgotPasswordToken: String,
         forgotPasswordExpiry: Date,
         followers: [{
