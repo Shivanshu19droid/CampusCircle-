@@ -4,6 +4,7 @@ import cloudinary from "cloudinary";
 import fs from "fs/promises";
 import { config } from "dotenv";
 config();
+import { callForBio } from "../utils/utils.gemini.js";
 
 const cookieOptions = {
   maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -295,6 +296,31 @@ const unfollowUser = async(req, res, next) => {
   }
 }
 
+//to generate ai powered bio
+const generateAiBio = async(req, res, next) => {
+  try{
+     
+    const {role, experience, skills, highlights} = req.body;
+
+    if(!role || !experience || !skills || !highlights){
+      return next(new AppError("All fields are required", 400));
+    }
+
+    const bio = await callForBio({role, experience, skills, highlights});
+
+    console.log(bio);
+
+    res.status(200).json({
+      success: true,
+      message: "Here's an impactful bio matching you profile",
+      bio
+    });
+
+    } catch(error){
+        return next(new AppError(error.message || "Gemini API Error", 500));
+  }
+}
+
 
 
 
@@ -307,5 +333,6 @@ export {
     updateMyProfile,
     getUserProfile,
     followUser,
-    unfollowUser
+    unfollowUser,
+    generateAiBio
 }

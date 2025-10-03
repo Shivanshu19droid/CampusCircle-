@@ -1,6 +1,6 @@
 import { Router } from "express";
 import upload from "../middlewares/multer.middleware.js";
-import { loginUser, signUpUser, logoutUser, getMyProfile, updateMyProfile, getUserProfile, followUser, unfollowUser} from "../controllers/user.controllers.js";
+import { loginUser, signUpUser, logoutUser, getMyProfile, updateMyProfile, getUserProfile, followUser, unfollowUser, generateAiBio} from "../controllers/user.controllers.js";
 import { isLoggedIn } from "../middlewares/auth.middleware.js";
 
 
@@ -14,6 +14,7 @@ userRoutes.put("/updateProfile", isLoggedIn, upload.fields([{name: "avatar"}, {n
 userRoutes.get("/:id", getUserProfile);
 userRoutes.put("/follow/:id", isLoggedIn, followUser);
 userRoutes.put("/unfollow/:id", isLoggedIn, unfollowUser);
+userRoutes.post("/generate-ai-bio", isLoggedIn, generateAiBio);
 
 
 export default userRoutes;
