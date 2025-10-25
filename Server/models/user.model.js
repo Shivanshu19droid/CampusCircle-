@@ -59,6 +59,21 @@ const userSchema = new Schema(
             maxLength: 200,
             default: ""
         },
+        currentProfession: {
+            type: String,
+            maxLength: 50,
+            default: ""
+        },
+        currentCompany: {
+            type: String,
+            maxLength: 50,
+            default: ""
+        },
+        currentLocation: {
+            type: String,
+            maxLength: 50,
+            default: ""
+        },
         skills: [String], //array of strings
         links: {
             github: String,
@@ -67,7 +82,7 @@ const userSchema = new Schema(
         },
         role: {
             type: String,
-            enum: ["ADMIN", "ALUMNI", "STUDENT"],
+            enum: ["ADMIN", "ALUMNI", "STUDENT", "FACULTY"],
             default: "STUDENT"
         },
         batch: {

@@ -18,7 +18,7 @@ Skills: ${skills}
 Highlights: ${highlights}
 
 Tone: engaging, professional, inspiring.
-Length: 3-5 sentences., return a single response only, brief enough to be on the bio so that it highlights the users portfolio at a glance.
+Length: 2-3 sentences., return a single response only, brief enough to be on the bio so that it highlights the users portfolio at a glance -- short yet impactful. Maximum allowed length is 200 characters
   `;
 
   // Use `generate` instead of `responses.create`

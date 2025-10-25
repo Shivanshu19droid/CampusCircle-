@@ -75,20 +75,24 @@ const signUpUser = async (req, res, next) => {
 };
 
 //login user
-const loginUser = async(req, res, next) => {
+const loginUser = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
 
-  try{
-      const {email, password} = req.body;
+    const user = await User.findOne({ email }).select("+password");
 
-    const user = await User.findOne({email}).select("+password");
-
-    if(!user){
-      return next(new AppError("No user found, check if the email you entered is correct", 400));
+    if (!user) {
+      return next(
+        new AppError(
+          "No user found, check if the email you entered is correct",
+          400
+        )
+      );
     }
 
     const isMatch = await user.comparePassword(password, user.password);
 
-    if(!isMatch){
+    if (!isMatch) {
       return next(new AppError("The Email or Password is incorrect"));
     }
 
@@ -102,16 +106,13 @@ const loginUser = async(req, res, next) => {
       message: "You have been logged in successfully",
       user,
     });
-
-
-  } catch(error){
+  } catch (error) {
     return next(new AppError(error.message, 500));
   }
-
-}
+};
 
 //logout user
-const logoutUser = async(req, res) => {
+const logoutUser = async (req, res) => {
   res.cookie("token", null, {
     secure: true,
     maxAge: 0,
@@ -120,131 +121,154 @@ const logoutUser = async(req, res) => {
 
   res.status(200).json({
     success: true,
-    message: "You have been logged out successfully"
+    message: "You have been logged out successfully",
   });
-}
+};
 
-const getMyProfile = async(req, res, next) => {
-  try{
-     const user = await User.findById(req.user.id).select("-password");
-     if(!user){
+const getMyProfile = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    if (!user) {
       return next(new AppError("No User Found", 404));
-     }
+    }
 
-     res.status(200).json({
+    res.status(200).json({
       success: true,
       message: "User Profile fetched successfully",
-      user
-     })
-  } catch(error){
+      user,
+    });
+  } catch (error) {
     return next(new AppError(error.message, 500));
   }
-}
+};
 
-const updateMyProfile = async(req, res, next) => {
-  try{
-    const {fullName, bio, skills, links} = req.body;
+const updateMyProfile = async (req, res, next) => {
+  try {
+    const {
+      fullName,
+      bio,
+      skills,
+      links, // { github, linkedIn, portfolio }
+      currentProfession,
+      currentCompany,
+      currentLocation,
+      batch,
+      role,
+    } = req.body;
 
     const updatedData = {
       fullName,
       bio,
-      skills,
-      links
-    }
+      skills: skills ? skills.split(",").map((skill) => skill.trim()) : [],
+      links,
+      currentProfession,
+      currentCompany,
+      currentLocation,
+      batch,
+      role,
+    };
 
     //updating the avatar
-    if(req.files && req.files.avatar){
-        try{
-          const result = await cloudinary.v2.uploader.upload(req.files.avatar[0].path, {
-          folder: "CampusCircle/avatars",
-          width: 250,
-          gravity: "faces",
-          crop: "fill"
-        });
+    if (req.files && req.files.avatar) {
+      try {
+        const result = await cloudinary.v2.uploader.upload(
+          req.files.avatar[0].path,
+          {
+            folder: "CampusCircle/avatars",
+            width: 250,
+            gravity: "faces",
+            crop: "fill",
+          }
+        );
 
-        if(result){
+        if (result) {
           updatedData.avatar = {
             public_id: result.public_id,
-            secure_url: result.secure_url
-          }
+            secure_url: result.secure_url,
+          };
         }
 
         fs.rm(`uploads/${req.files.avatar[0].filename}`);
-      
-        } catch(error){
-          return next(new AppError(error.message || "Avatar upload failed", 500));
-        }
-    }
-
-    //updating the cover image
-    if(req.files && req.files.coverImage){
-      
-      try{
-          const result = await cloudinary.v2.uploader.upload(req.files.coverImage[0].path, {
-          folder: "CampusCircle/CoverImages"
-        });
-
-        if(result){
-          updatedData.coverImage = {
-            public_id: result.public_id,
-            secure_url: result.secure_url
-          }
-
-          fs.rm(`uploads/${req.files.coverImage[0].filename}`);
-        }
-      } catch(error){
-        return next(new AppError(error.message || "CoverImage Upload failed", 500));
+      } catch (error) {
+        return next(new AppError(error.message || "Avatar upload failed", 500));
       }
     }
 
-    const user = await User.findByIdAndUpdate(req.user.id, updatedData, {new: true, runValidators: true});
+    //updating the cover image
+    if (req.files && req.files.coverImage) {
+      try {
+        const result = await cloudinary.v2.uploader.upload(
+          req.files.coverImage[0].path,
+          {
+            folder: "CampusCircle/CoverImages",
+          }
+        );
 
-    if(!user){
-      return next(new AppError("User not found", 404));
+        if (result) {
+          updatedData.coverImage = {
+            public_id: result.public_id,
+            secure_url: result.secure_url,
+          };
+
+          fs.rm(`uploads/${req.files.coverImage[0].filename}`);
+        }
+      } catch (error) {
+        return next(
+          new AppError(error.message || "CoverImage Upload failed", 500)
+        );
+      }
     }
 
+    const user = await User.findByIdAndUpdate(req.user.id, updatedData, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!user) {
+      return next(new AppError("User not found", 404));
+    }
 
     res.status(200).json({
       success: true,
       message: "Profile updated successfully",
-      user
+      user,
     });
-
-    }
-    catch(error){
+  } catch (error) {
     return next(new AppError(error.message, 500));
   }
-}
+};
 
-const getUserProfile = async(req, res, next) => {
-  try{
+const getUserProfile = async (req, res, next) => {
+  try {
     const user = await User.findById(req.params.id).select("-password");
 
-    if(!user){
+    if (!user) {
       return next(new AppError("User not found", 404));
     }
 
     res.status(200).json({
       success: true,
       message: "User Profile fetched successfully",
-      user
-    })
-  } catch(error){
+      user,
+    });
+  } catch (error) {
     return next(new AppError(error.message, 500));
   }
-}
+};
 
-const followUser = async(req, res, next) => {
-  try{
+const followUser = async (req, res, next) => {
+  try {
     const userToFollow = await User.findById(req.params.id);
     const currentUser = await User.findById(req.user.id);
 
-    if(!userToFollow || !currentUser){
+    if (!userToFollow || !currentUser) {
       return next(new AppError("User not found", 404));
     }
 
-    if(currentUser.following.includes(userToFollow._id)){
-      return next(new AppError(`You are already following ${userToFollow.fullName}`, 400));
+    if (currentUser.following.includes(userToFollow._id)) {
+      return next(
+        new AppError(`You are already following ${userToFollow.fullName}`, 400)
+      );
     }
 
     currentUser.following.push(userToFollow._id);
@@ -252,37 +276,38 @@ const followUser = async(req, res, next) => {
 
     await currentUser.save();
     await userToFollow.save();
-    
+
     res.status(200).json({
       success: true,
       message: `You are now following ${userToFollow.fullName}`,
     });
-
-  } catch(error){
+  } catch (error) {
     return next(new AppError(error.message, 500));
   }
-}
+};
 
-const unfollowUser = async(req, res, next) => {
-  try{
+const unfollowUser = async (req, res, next) => {
+  try {
     const userToUnfollow = await User.findById(req.params.id);
     const currentUser = await User.findById(req.user.id);
 
-    if(!userToUnfollow || !currentUser){
+    if (!userToUnfollow || !currentUser) {
       return next(new AppError("User not found", 404));
     }
 
-    if(!currentUser.following.includes(userToUnfollow._id)){
-      return next(new AppError(`You are not following ${userToUnfollow.fullName}`, 400));
+    if (!currentUser.following.includes(userToUnfollow._id)) {
+      return next(
+        new AppError(`You are not following ${userToUnfollow.fullName}`, 400)
+      );
     }
 
     userToUnfollow.followers = userToUnfollow.followers.filter(
       (id) => id.toString() !== currentUser._id.toString()
-    )
+    );
 
     currentUser.following = currentUser.following.filter(
       (id) => id.toString() !== userToUnfollow._id.toString()
-    )
+    );
 
     await userToUnfollow.save();
     await currentUser.save();
@@ -290,49 +315,43 @@ const unfollowUser = async(req, res, next) => {
     res.status(200).json({
       success: true,
       message: `You have unfollowed ${userToUnfollow.fullName}`,
-    })
-  } catch(error){
+    });
+  } catch (error) {
     return next(new AppError(error.message, 500));
   }
-}
+};
 
 //to generate ai powered bio
-const generateAiBio = async(req, res, next) => {
-  try{
-     
-    const {role, experience, skills, highlights} = req.body;
+const generateAiBio = async (req, res, next) => {
+  try {
+    const { role, experience, skills, highlights } = req.body;
 
-    if(!role || !experience || !skills || !highlights){
+    if (!role || !experience || !skills || !highlights) {
       return next(new AppError("All fields are required", 400));
     }
 
-    const bio = await callForBio({role, experience, skills, highlights});
+    const bio = await callForBio({ role, experience, skills, highlights });
 
     console.log(bio);
 
     res.status(200).json({
       success: true,
       message: "Here's an impactful bio matching you profile",
-      bio
+      bio,
     });
-
-    } catch(error){
-        return next(new AppError(error.message || "Gemini API Error", 500));
+  } catch (error) {
+    return next(new AppError(error.message || "Gemini API Error", 500));
   }
-}
-
-
-
-
+};
 
 export {
-    signUpUser,
-    loginUser,
-    logoutUser,
-    getMyProfile,
-    updateMyProfile,
-    getUserProfile,
-    followUser,
-    unfollowUser,
-    generateAiBio
-}
+  signUpUser,
+  loginUser,
+  logoutUser,
+  getMyProfile,
+  updateMyProfile,
+  getUserProfile,
+  followUser,
+  unfollowUser,
+  generateAiBio,
+};
