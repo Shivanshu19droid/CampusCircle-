@@ -98,6 +98,10 @@ const userSchema = new Schema(
         following: [{
             type: mongoose.Schema.Types.ObjectId,
             ref: "User"
+        }],
+        groups: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Group"
         }]
     
     }, {timestamps: true}
