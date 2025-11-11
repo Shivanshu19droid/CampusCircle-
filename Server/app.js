@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import userRoutes from "./routes/user.route.js";
 import cookieParser from "cookie-parser";
 import groupRoutes from "./routes/group.route.js";
+import postRoutes from "./routes/post.route.js";
 
 dotenv.config();
 const app = express();
@@ -27,5 +28,6 @@ app.get("/", (req, res) => {
 
 app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/group', groupRoutes);
+app.use('/api/v1/post', postRoutes);
 
 export default app;
