@@ -1,6 +1,8 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "../Redux/Slices/AuthSlice";
 import profileReducer from "../Redux/Slices/ProfileSlice";
+import groupReducer from "../Redux/Slices/GroupSlice";
+import postReducer from "../Redux/Slices/postSlice";
 
 
 
@@ -8,7 +10,9 @@ import profileReducer from "../Redux/Slices/ProfileSlice";
 const store = configureStore({
     reducer: {
         auth: authReducer,
-        profile: profileReducer
+        profile: profileReducer,
+        group: groupReducer,
+        post: postReducer
     }
 });
 

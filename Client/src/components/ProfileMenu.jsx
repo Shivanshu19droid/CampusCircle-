@@ -4,9 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../../Redux/Slices/AuthSlice";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import ConfirmModal from "./ConfirmModal";
 
-const ProfileMenu = () => {
+const ProfileMenu = ({onLogoutClick}) => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -14,18 +15,21 @@ const ProfileMenu = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const user = useSelector((state) => state.auth.data);
 
+  //const [openConfirm, setOpenConfirm] = useState(false);
+
   useEffect(() => {
     console.log(user);
   });
 
-  async function handleLogout() {
-    try{
-      await dispatch(logoutUser());
-      navigate("/");
-    } catch(error){
-      toast.error(error.message);
-    }
-  }
+  // async function handleLogout() {
+  //   try{
+  //     await dispatch(logoutUser());
+  //     setOpenConfirm(false);
+  //     navigate("/");
+  //   } catch(error){
+  //     toast.error(error.message);
+  //   }
+  // }
 
   if (!isLoggedIn) {
     return (
@@ -51,6 +55,7 @@ const ProfileMenu = () => {
   
   return (
     (
+    <>
      <div className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-lg p-4 border border-gray-100 animate-fadeIn">
       <div className="flex items-center gap-3 mb-3 pb-3 border-b border-gray-100">
         <img
@@ -70,10 +75,22 @@ const ProfileMenu = () => {
       >
         View Profile
       </Link>
-      <button onClick={handleLogout}className="text-sm text-red-500 hover:text-red-600 transition-colors">
+      <button onClick={onLogoutClick}className="text-sm text-red-500 hover:text-red-600 transition-colors">
         Logout
       </button>
-    </div> 
+
+      
+    </div>
+
+    {/* <ConfirmModal
+       isOpen = {openConfirm}
+       message = "Are you sure you want to logout?"
+       onConfirm = {handleLogout}
+       onCancel = {() => setOpenConfirm(false)}
+      /> */}
+
+    </> 
+     
     )
   );
 };

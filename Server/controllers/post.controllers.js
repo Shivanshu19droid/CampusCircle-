@@ -4,6 +4,7 @@ import User from "../models/user.model.js";
 import Post from "../models/post.model.js";
 import AppError from "../utils/error.util.js";
 import QueuedPost from "../models/queuedPost.model.js";
+import fs from 'fs';
 
 // create post
 const createPost = async (req, res, next) => {
@@ -29,6 +30,10 @@ const createPost = async (req, res, next) => {
 
     // 4️⃣ Handle image upload (if present)
     const postImage = {};
+
+    if(!req.file){
+      console.log(" no image exists");
+    }
     if (req.file) {
       const uploadedImage = await cloudinary.v2.uploader.upload(req.file.path, {
         folder: "CampusCircle/posts",
@@ -39,6 +44,8 @@ const createPost = async (req, res, next) => {
 
       postImage.public_id = uploadedImage.public_id;
       postImage.secure_url = uploadedImage.secure_url;
+
+      console.log(postImage);
 
       // delete local file after upload
       fs.unlinkSync(req.file.path);
@@ -114,7 +121,8 @@ const handleLikeUnlike = async (req, res, next) => {
     const {postId}  = req.params;
     const userId = req.user.id;
 
-    const post = await Post.findById(postId);
+    const post = await Post.findById(postId)
+                     .populate("author", "fullName avatar");
 
     if (!post) {
       return next(new AppError("Post not found", 404));
@@ -136,6 +144,7 @@ const handleLikeUnlike = async (req, res, next) => {
         success: true,
         message: "UnLiked",
         likesCount: post.likes.length,
+        post
       });
     } else {
       // like
@@ -146,6 +155,7 @@ const handleLikeUnlike = async (req, res, next) => {
         success: true,
         message: "👍Liked",
         likesCount: post.likes.length,
+        post
       });
     }
   } catch (error) {
@@ -304,6 +314,7 @@ const getAllPosts = async(req, res, next) => {
 
     const discoveryPosts = await Post.find({
       author: { $nin: [...followingIds, userId] },
+      group: { $nin: joinedGroupIds}
     })
       .populate("author", "fullName avatar")
       .populate("group", "name icon")
@@ -331,43 +342,59 @@ const getAllPosts = async(req, res, next) => {
 const viewPost = async(req, res, next) => {
   try {
     const {postId} = req.params;
-    const {page=1, limit=10} = req.query;
 
     const post = await Post.findById(postId)
     .populate("author", "fullName avatar")
-    .populate("group", "name icon")
+    .populate("group", "name icon admin")
     .lean();
 
     if(!post) {
       return next(new AppError("Post not found", 404));
     }
 
-    const skip = (page - 1) * limit;
-
-    const sortedComments = post.comments.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-    const paginatedComments = sortedComments.slice(skip, skip + parseInt(limit));
-
-    const hasMore = skip + parseInt(limit) < sortedComments.length;
+    const {comments, ...rest} = post;
 
     return res.status(200).json({
       success: true,
       message: "Post fetched successfully",
-      post: {
-        ...post,
-        comments: paginatedComments, // only paginated comments returned
-      },
-      pagination: {
-        currentPage: page,
-        totalComments: sortedComments.length,
-        hasMore,
-      },
+      post: rest
     });
 
   } catch(error) {
     return next(new AppError(error.message, 500));
   }
 };
+
+// getting the paginated comments for a post
+const getPaginatedComments = async(req, res, next) => {
+  try {
+    const {postId} = req.params;
+    const {page=1, limit=10} = req.query;
+
+    const post = await Post.findById(postId)
+    .populate("comments.author", "fullName avatar");
+
+    if(!post) {
+      return next(new AppError("Post not found", 404));
+    }
+
+    const skip = (page - 1) * limit;
+    
+    const comments = post.comments.slice(skip, skip + parseInt(limit));
+
+    const sortedComments = comments.sort((a,b) => b.createdAt - a.createdAt);
+
+    const hasMore = skip + parseInt(limit) < post.comments.length;
+
+    return res.status(200).json({
+      success: true,
+      comments: sortedComments,
+      hasMore
+    })
+  } catch(error) {
+    return next(new AppError(error.message, 500));
+  }
+}
 
 // delete post
 const deletePost = async (req, res, next) => {
@@ -412,6 +439,42 @@ const deletePost = async (req, res, next) => {
   }
 };
 
+const deleteComment = async (req, res, next) => {
+    try {
+      const userId = req.user.id;
+      const {postId, commentId} = req.params;
+
+      const post = await Post.findById(postId);
+
+      if(!post) {
+        return next(new AppError("Post not found", 404));
+      }
+
+      const comment = post.comments.find(comment => comment._id.toString() === commentId);
+      
+      if(!comment) {
+        return next(new AppError("Comment not found", 404));
+      }
+
+      const hasPermission = comment.author.toString() === userId || post.author.toString() === userId;
+
+      if(!hasPermission) {
+        return next(new AppError("You do not have permission to delete this comment", 403));
+      }
+
+      post.comments = post.comments.filter(comment => comment._id.toString() !== commentId);
+      await post.save();
+
+      return res.status(200).json ({
+        success: true,
+        message: "You deleted this comment",
+        deletedComment: comment
+      })
+    } catch(error) {
+      return next(new AppError(error.message, 500));
+    }
+  }
+
 export {
   createPost,
   handleLikeUnlike,
@@ -420,7 +483,9 @@ export {
   rejectPost,
   getAllPosts,
   viewPost,
-  deletePost
+  deletePost,
+  getPaginatedComments,
+  deleteComment
 };
 
 

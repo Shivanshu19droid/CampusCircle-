@@ -10,6 +10,9 @@ import SignUpFunc from "./pages/Auth/signupPage.jsx";
 import ViewProfile from "./pages/Profile/viewProfilePage.jsx";
 import ProtectedRoutes from "./components/Auth/ProtectedRoute.jsx";
 import EditProfile from "./pages/Profile/editProfilePage.jsx";
+import CommunityPage from "./pages/community/CommunityPage.jsx";
+import PostPage from "./pages/community/PostPage.jsx";
+import GroupPage from "./pages/community/GroupPage.jsx";
 
 
 function App() {
@@ -28,6 +31,9 @@ function App() {
               <EditProfile />
             </ProtectedRoutes>} 
             />
+            <Route path="/community" element={<CommunityPage />} />
+            <Route path="/community/posts/:postId" element={<PostPage/>} />
+            <Route path="/community/groups/:groupId" element={<GroupPage/>} />
             
          </Routes>
          <Toaster />
@@ -36,4 +42,4 @@ function App() {
   )
 }
 
-export default App
+export default App;

@@ -3,7 +3,7 @@ import { useState } from "react";
 import ProfileMenu from "./ProfileMenu";
 import { useSelector } from "react-redux";
 
-const Navbar = ({ toggleSidebar }) => {
+const Navbar = ({ toggleSidebar, onLogoutClick }) => {
   const [showProfile, setShowProfile] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(true); // change later with auth
 
@@ -40,7 +40,7 @@ const Navbar = ({ toggleSidebar }) => {
               className="w-9 h-9 rounded-full cursor-pointer ring-2 ring-transparent hover:ring-indigo-200 transition"
               onClick={() => setShowProfile(!showProfile)}
             />
-            {showProfile && <ProfileMenu />}
+            {showProfile && <ProfileMenu onLogoutClick={onLogoutClick} />}
           </div>
         )}
       </div>
