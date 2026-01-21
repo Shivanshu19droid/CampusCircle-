@@ -70,7 +70,7 @@ const ProfileMenu = ({onLogoutClick}) => {
       </div>
 
       <Link
-        to={`/view-profile/${user._id}`}
+        to={`/view-profile/${user?._id}`}
         className="block text-sm text-gray-700 hover:text-indigo-600 mb-2 transition-colors"
       >
         View Profile

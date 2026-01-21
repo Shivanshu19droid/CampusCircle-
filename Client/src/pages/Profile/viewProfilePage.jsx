@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { fetchUserProfile } from "../../../Redux/Slices/ProfileSlice";
+import { fetchPaginatedUserPosts, fetchUserProfile, followUser, unfollowUser } from "../../../Redux/Slices/ProfileSlice";
 import { useParams } from "react-router-dom";
 import HomeLayout from "../../layouts/HomeLayouts";
 import { useNavigate } from "react-router-dom";
@@ -8,6 +8,10 @@ import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { useRef } from "react";
 import { FaGithub, FaLinkedin, FaGlobe } from "react-icons/fa";
+import FeedContainer from "../../components/community/FeedContainer";
+import { likeUnlikePost } from "../../../Redux/Slices/postSlice";
+import ConfirmModal from "../../components/ConfirmModal";
+
 
 
 function ViewProfile() {
@@ -15,27 +19,105 @@ function ViewProfile() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const didFetch = useRef(false);
+    //const didFetch = useRef(false);
 
     const loggedInUser = useSelector((state) => state.auth.data);
 
-    const {id} = useParams()
+    const {id} = useParams();
+
+    // user posts
+    const userPosts = useSelector((state) => state?.profile?.userPosts);
+    const isLoading = useSelector((state) => state?.profile?.isLoading);
+    const loadingMorePosts = useSelector((state) => state?.profile?.loadingMorePosts);
+    const hasMorePosts = useSelector((state) => state?.profile?.hasMorePosts);
+    const postsCount = useSelector((state) => state?.profile?.postsCount);
+    const page = useSelector((state) => state?.profile?.page);
 
     useEffect( () => {
-        if(!didFetch.current){
             dispatch(fetchUserProfile(id));
-            didFetch.current = true;
-        }
+            
+            dispatch(fetchPaginatedUserPosts({id, page: 1}));
+
     }, [id])
 
     const searchedUser = useSelector((state) => state.profile.data);
 
-    console.log(id);
-    console.log(searchedUser);
+    // loading more posts
+    const onLoadMorePosts = () => {
+      if(hasMorePosts && !loadingMorePosts) {
+        dispatch(fetchPaginatedUserPosts({id, page: page + 1}));
+      }
+    }
 
+    // like unlike
+    const handleLike = (postId) => {
+      dispatch(likeUnlikePost(postId));
+    }
 
-    return (
+    const isFollowing = loggedInUser?.following?.includes(searchedUser?._id);
+
+    // follow user
+    const handleFollow = async () => {
+
+      if(isFollowing) {
+        toast.error("You are already following this user");
+        return;
+      }
+
+      dispatch(followUser(id));
+
+    }
+
+    // unfollow user
+    const handleUnFollow = async () => {
+
+      if(!isFollowing) {
+        toast.error("You do not follow this user");
+        return;
+      }
+      dispatch(unfollowUser(id));
+
+    }
+
+    // confirm handler
+    const [confirmState, setConfirmState] = useState({
+      isOpen: false,
+      message: "",
+      title: "",
+      payload: null
+    });
+
+    const openConfirm = ({
+      type,
+      payload = null,
+      title = "Please Confirm!",
+      message = ""
+    }) => {
+      setConfirmState({isOpen: true, type, payload, title, message});
+    }
+
+    const closeConfirm = () => {
+      setConfirmState((s) => ({...s, isOpen: false}));
+    }
+
+    const getConfirmHandler = () => {
+      
+      const {type, payload} = confirmState;
+
+      switch(type) {
+        case "unfollow":
+          return () => {
+            handleUnFollow(payload?.id);
+          }
+        
+          default: 
+            return () => {};
+      }
+    };
+
+   return (
   <HomeLayout>
+    {/* Profile Card */}
     <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-sm mt-8 overflow-hidden">
       {/* Cover Image */}
       <div className="relative h-48 bg-gray-200">
@@ -89,18 +171,34 @@ function ViewProfile() {
             )}
           </div>
 
+          {/* Action Button (slightly left + larger) */}
           {loggedInUser?._id === searchedUser?._id ? (
             <button
               onClick={() => navigate("/edit-profile")}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+              className="mr-4 px-5 py-2.5 text-base bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
             >
               Edit Profile
             </button>
+          ) : isFollowing ? (
+            <button
+              onClick={() => {
+                openConfirm({
+                  type: "unfollow",
+                  payload: searchedUser._id,
+                  title: "Unfollow user",
+                  message: `Are you sure you want to unfollow ${searchedUser.fullName}?`,
+                });
+              }}
+              className="mr-4 px-5 py-2.5 text-base bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+            >
+              Following
+            </button>
           ) : (
-            <button className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-              {searchedUser?.followers?.includes(loggedInUser?._id)
-                ? "Unfollow"
-                : "Follow"}
+            <button
+              onClick={handleFollow}
+              className="mr-4 px-5 py-2.5 text-base bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+            >
+              Follow
             </button>
           )}
         </div>
@@ -196,8 +294,56 @@ function ViewProfile() {
         </div>
       </div>
     </div>
+
+    {/* Posts Indicator */}
+    <div className="max-w-5xl mx-auto mt-8">
+      <div className="flex items-center justify-between mb-2">
+        <h2 className="text-lg font-semibold text-gray-800">Posts</h2>
+        <span className="text-sm text-gray-500">
+          {postsCount || 0} posts
+        </span>
+      </div>
+      <div className="border-t border-gray-200" />
+    </div>
+
+    {/* Feed Section */}
+    <div className="max-w-5xl mx-auto mt-6">
+      <FeedContainer
+        posts={userPosts}
+        hasMore={hasMorePosts}
+        loadingMore={loadingMorePosts}
+        onLoadMore={onLoadMorePosts}
+        onLike={handleLike}
+      />
+    </div>
+
+    {/* Confirm Modal */}
+    <ConfirmModal
+      isOpen={confirmState.isOpen}
+      title={confirmState.title}
+      message={confirmState.message}
+      onCancel={closeConfirm}
+      onConfirm={async () => {
+        try {
+          const handler = getConfirmHandler();
+          if (typeof handler === "function") {
+            const result = handler();
+            if (result && typeof result.then === "function") {
+              await result;
+            }
+          }
+        } catch (err) {
+          console.error("Confirm action failed:", err);
+        } finally {
+          closeConfirm();
+        }
+      }}
+    />
   </HomeLayout>
 );
+
+
+
 
   
 

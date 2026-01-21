@@ -5,6 +5,8 @@ import fs from "fs/promises";
 import { config } from "dotenv";
 config();
 import { callForBio } from "../utils/utils.gemini.js";
+import Post from "../models/post.model.js";
+import mongoose from "mongoose";
 
 const cookieOptions = {
   maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -330,6 +332,55 @@ const getUserProfile = async (req, res, next) => {
   }
 };
 
+const fetchPaginatedUserPosts = async(req, res, next) => {
+  try {
+   
+    const userId = req.params.id;
+
+    if(!mongoose.Types.ObjectId.isValid(userId)) {
+      return next(new AppError("Inavalid user id"));
+    }
+
+    const {page=1, limit=10} = req.query;
+
+    const pageNum = Math.max(parseInt(page, 10) || 1, 1);
+    const limitNum = parseInt(limit, 10);
+    const skip = (pageNum - 1) * limitNum;
+
+    const posts = await Post.find({author: userId})
+                  .populate("author", "_id fullName avatar")
+                  .sort({createdAt: -1})
+                  .skip(skip)
+                  .limit(limitNum + 1)
+                  .lean();
+
+    if(!posts) {
+      return next(new AppError("Posts not found", 404));
+    }
+
+    const hasMore = posts.length > limitNum;
+
+    if(hasMore) {
+      posts.pop();
+    }
+
+    const postsCount = await Post.countDocuments({author: userId});
+
+    return res.status(200).json({
+      success: true,
+      posts: posts,
+      hasMorePosts: hasMore,
+      page,
+      limit,
+      postsCount
+    })
+
+    
+  } catch(error) {
+    return next(new AppError(error.message, 500));
+  }
+}
+
 const followUser = async (req, res, next) => {
   try {
     const userToFollow = await User.findById(req.params.id);
@@ -354,6 +405,7 @@ const followUser = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: `You are now following ${userToFollow.fullName}`,
+      userToFollow
     });
   } catch (error) {
     return next(new AppError(error.message, 500));
@@ -389,6 +441,7 @@ const unfollowUser = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: `You have unfollowed ${userToUnfollow.fullName}`,
+      userToUnfollow
     });
   } catch (error) {
     return next(new AppError(error.message, 500));
@@ -418,6 +471,7 @@ const generateAiBio = async (req, res, next) => {
   }
 };
 
+
 export {
   signUpUser,
   loginUser,
@@ -426,6 +480,7 @@ export {
   getMyProfile,
   updateMyProfile,
   getUserProfile,
+  fetchPaginatedUserPosts,
   followUser,
   unfollowUser,
   generateAiBio,

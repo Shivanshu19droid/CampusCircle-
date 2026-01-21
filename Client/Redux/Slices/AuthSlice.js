@@ -2,6 +2,7 @@ import axiosInstance from "../../src/Helpers/axiosInstance";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-hot-toast";
 import { createNewGroup, joinGroup, leaveGroup } from "./GroupSlice";
+import { followUser, unfollowUser } from "./ProfileSlice";
 
 const initialState = {
   isLoggedIn: localStorage.getItem("isLoggedIn") || false,
@@ -143,6 +144,12 @@ const authSlice = createSlice({
       })
       .addCase(leaveGroup.fulfilled, (state, action) => {
         state.data.groups = state?.data?.groups?.filter(group => group !== action?.payload?.group?._id);
+      })
+      .addCase(followUser.fulfilled, (state, action) => {
+        state.data.following.push(action?.payload?.userToFollow?._id);
+      })
+      .addCase(unfollowUser.fulfilled, (state, action) => {
+        state.data.following = state?.data?.following?.filter(user => user !== action?.payload?.userToUnfollow?._id);
       })
   },
 });
