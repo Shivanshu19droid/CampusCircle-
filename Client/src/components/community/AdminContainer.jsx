@@ -1,5 +1,6 @@
 import MemberCard from "./MemberCard";
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 
 function AdminContainer({
   isOpen,
@@ -46,7 +47,7 @@ function AdminContainer({
 
   if (!isOpen) return null;
 
- return (
+ return createPortal(
   <div
     role="dialog"
     aria-modal="true"
@@ -110,7 +111,8 @@ function AdminContainer({
         </p>
       )}
     </div>
-  </div>
+  </div>,
+  document.body
 );
 
 }

@@ -13,14 +13,30 @@ import EditProfile from "./pages/Profile/editProfilePage.jsx";
 import CommunityPage from "./pages/community/CommunityPage.jsx";
 import PostPage from "./pages/community/PostPage.jsx";
 import GroupPage from "./pages/community/GroupPage.jsx";
+import QueuedPostPage from "./pages/community/QueuedPostPage.jsx";
+import VantaLayer from "./components/VantaLayer.jsx";
+import CreatePostPage from "./pages/community/CreatePostPage.jsx";
+import CreateGroupPage from "./pages/community/CreateGroupPage.jsx";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { fetchCurrentUser } from "../Redux/Slices/AuthSlice.js";
+import EditGroupPage from "./pages/community/EditGroupPage.jsx";
+
 
 
 function App() {
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchCurrentUser());
+  }, [dispatch]);
   
 
   return (
-   <Provider store={store}>
        <BrowserRouter>
+       {/* VANTA BACKGROUND — mounted ONCE */}
+       
          <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<LoginFunc />} />
@@ -34,11 +50,14 @@ function App() {
             <Route path="/community" element={<CommunityPage />} />
             <Route path="/community/posts/:postId" element={<PostPage/>} />
             <Route path="/community/groups/:groupId" element={<GroupPage/>} />
+            <Route path="/community/:groupId/queued-posts" element={<QueuedPostPage />} />
+            <Route path="/community/create-post" element={<CreatePostPage />} />
+            <Route path="/community/new-group" element={<CreateGroupPage />} />
+            <Route path="/community/:groupId/edit-group" element={<EditGroupPage />} />
             
          </Routes>
          <Toaster />
     </BrowserRouter>
-   </Provider>
   )
 }
 

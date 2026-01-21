@@ -1,6 +1,7 @@
 import axiosInstance from "../../src/Helpers/axiosInstance";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-hot-toast";
+import { createNewGroup, joinGroup, leaveGroup } from "./GroupSlice";
 
 const initialState = {
   isLoggedIn: localStorage.getItem("isLoggedIn") || false,
@@ -64,6 +65,16 @@ export const logoutUser = createAsyncThunk("/auth/logout", async () => {
   }
 });
 
+//get current user on refresh
+export const fetchCurrentUser = createAsyncThunk("auth/refresh", async () => {
+  try {
+    const res = await axiosInstance.get("/user/refresh");
+    return res.data;
+  } catch(error) {
+    toast.error(error?.response?.data?.message);
+  }
+})
+
 //fetch my profile
 export const getMyProfile = createAsyncThunk("/user/my-profile", async () => {
   try {
@@ -110,6 +121,11 @@ const authSlice = createSlice({
         state.role = "";
         state.data = {};
       })
+      .addCase(fetchCurrentUser.fulfilled, (state, action) => {
+        const { user } = action?.payload;
+        localStorage.setItem("data", JSON.stringify(user));
+        state.data = user;
+      })
       .addCase(getMyProfile.fulfilled, (state, action) => {
         localStorage.setItem("data", JSON.stringify(action?.payload?.user));
         localStorage.setItem("isLoggedIn", true);
@@ -118,7 +134,16 @@ const authSlice = createSlice({
         state.data = action?.payload?.user;
         state.isLoggedIn = true;
         state.role = action?.payload?.user?.role;
-      });
+      })
+      .addCase(createNewGroup.fulfilled, (state, action) => {
+        state.data.groups.push(action?.payload?.newGroup?._id);
+      })
+      .addCase(joinGroup.fulfilled, (state, action) => {
+        state.data.groups.push(action?.payload?.group?._id);
+      })
+      .addCase(leaveGroup.fulfilled, (state, action) => {
+        state.data.groups = state?.data?.groups?.filter(group => group !== action?.payload?.group?._id);
+      })
   },
 });
 

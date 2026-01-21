@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
 import { useRef } from "react";
+import { FaGithub, FaLinkedin, FaGlobe } from "react-icons/fa";
+
 
 function ViewProfile() {
 
@@ -50,7 +52,7 @@ function ViewProfile() {
         )}
 
         {/* Avatar */}
-        <div className="absolute -bottom-16 left-6 flex items-end">
+        <div className="absolute -bottom-16 left-6">
           <img
             src={
               searchedUser?.avatar?.secure_url ||
@@ -69,20 +71,24 @@ function ViewProfile() {
             <h1 className="text-2xl font-semibold">
               {searchedUser?.fullName || "No Name Yet"}
             </h1>
-            {(searchedUser?.currentProfession || searchedUser?.currentCompany) && (
+
+            {(searchedUser?.currentProfession ||
+              searchedUser?.currentCompany) && (
               <p className="text-gray-600">
-                {searchedUser.currentProfession
-                  ? searchedUser.currentProfession
-                  : ""}{" "}
-                {searchedUser.currentCompany ? `at ${searchedUser.currentCompany}` : ""}
+                {searchedUser.currentProfession || ""}
+                {searchedUser.currentCompany
+                  ? ` at ${searchedUser.currentCompany}`
+                  : ""}
               </p>
             )}
+
             {searchedUser?.currentLocation && (
-              <p className="text-gray-500 text-sm">{searchedUser.currentLocation}</p>
+              <p className="text-gray-500 text-sm">
+                {searchedUser.currentLocation}
+              </p>
             )}
           </div>
 
-          {/* Edit / Follow Button */}
           {loggedInUser?._id === searchedUser?._id ? (
             <button
               onClick={() => navigate("/edit-profile")}
@@ -91,9 +97,7 @@ function ViewProfile() {
               Edit Profile
             </button>
           ) : (
-            <button
-              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-            >
+            <button className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
               {searchedUser?.followers?.includes(loggedInUser?._id)
                 ? "Unfollow"
                 : "Follow"}
@@ -106,9 +110,11 @@ function ViewProfile() {
           {searchedUser?.bio || "No bio added yet."}
         </p>
 
-        {/* Location, Role & Batch */}
+        {/* Meta Info */}
         <div className="mt-3 flex flex-wrap gap-4 text-sm text-gray-500">
-          {searchedUser?.currentLocation && <span>📍 {searchedUser.currentLocation}</span>}
+          {searchedUser?.currentLocation && (
+            <span>📍 {searchedUser.currentLocation}</span>
+          )}
           {searchedUser?.batch && <span>🎓 Batch: {searchedUser.batch}</span>}
           {searchedUser?.role && <span>👤 Role: {searchedUser.role}</span>}
         </div>
@@ -132,46 +138,58 @@ function ViewProfile() {
 
         {/* Links */}
         {(searchedUser?.links?.github ||
-          searchedUser?.links?.linkedIn ||
+          searchedUser?.links?.linkedin ||
           searchedUser?.links?.portfolio) && (
-          <div className="mt-5">
-            <h3 className="font-semibold text-gray-800 mb-2">Links</h3>
-            <div className="flex gap-4">
-              {searchedUser?.links?.linkedIn && (
+          <div className="mt-6">
+            <h3 className="font-semibold text-gray-800 mb-3">Links</h3>
+
+            <div className="flex flex-wrap gap-4">
+              {searchedUser?.links?.linkedin && (
                 <a
-                  href={searchedUser.links.linkedIn}
+                  href={searchedUser.links.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
+                  className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-blue-50 transition"
                 >
-                  LinkedIn
+                  <FaLinkedin className="text-blue-600 text-xl" />
+                  <span className="text-sm font-medium text-blue-600">
+                    LinkedIn
+                  </span>
                 </a>
               )}
+
               {searchedUser?.links?.github && (
                 <a
                   href={searchedUser.links.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-800 hover:underline"
+                  className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-100 transition"
                 >
-                  GitHub
+                  <FaGithub className="text-gray-800 text-xl" />
+                  <span className="text-sm font-medium text-gray-800">
+                    GitHub
+                  </span>
                 </a>
               )}
+
               {searchedUser?.links?.portfolio && (
                 <a
                   href={searchedUser.links.portfolio}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-purple-600 hover:underline"
+                  className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-purple-50 transition"
                 >
-                  Portfolio
+                  <FaGlobe className="text-purple-600 text-xl" />
+                  <span className="text-sm font-medium text-purple-600">
+                    Portfolio
+                  </span>
                 </a>
               )}
             </div>
           </div>
         )}
 
-        {/* Followers & Following */}
+        {/* Followers / Following */}
         <div className="mt-6 flex gap-6 text-sm text-gray-600">
           <span>👥 {searchedUser?.followers?.length || 0} Followers</span>
           <span>➡️ {searchedUser?.following?.length || 0} Following</span>
@@ -180,6 +198,7 @@ function ViewProfile() {
     </div>
   </HomeLayout>
 );
+
   
 
 

@@ -77,7 +77,7 @@ const createPost = async (req, res, next) => {
       return next(new AppError("You are not a member of this group", 403));
     }
 
-    const isAdmin = group.admin.toString() === userId;
+    const isAdmin = group.admins.some((admin) => admin.toString() === userId);
 
     if (isAdmin) {
       const newPost = new Post({
@@ -217,8 +217,7 @@ const approvePost = async (req, res, next) => {
       return next(new AppError("Group not found", 404));
     }
 
-    // ✅ Safer comparison using .equals()
-    if (!group.admin.equals(userId)) {
+    if (!group?.admins?.some((admin) => admin.toString() === userId.toString())) {
       return next(new AppError("Only group admins are allowed to approve posts", 403));
     }
 
@@ -239,7 +238,7 @@ const approvePost = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: `${author.fullName}'s post has been approved`,
-      approvedPost,
+      approvedPost: queuedPost,
     });
   } catch (error) {
     return next(new AppError(error.message, 500));
@@ -266,7 +265,7 @@ const rejectPost = async(req, res, next) => {
         return next(new AppError("Group not found", 404)); 
       }
 
-      if(!group.admin.equals(userId)) {
+      if(!group.admins.some(admin => admin.toString() === userId.toString())) {
         return next(new AppError("Only group admins are allowed to reject posts", 403));
       }
 
@@ -306,6 +305,7 @@ const getAllPosts = async(req, res, next) => {
       $or: [
         { author: { $in: followingIds } },
         { group: { $in: joinedGroupIds } },
+        { author: userId}
       ],
     })
       .populate("author", "fullName avatar")
@@ -415,7 +415,7 @@ const deletePost = async (req, res, next) => {
     // Authorization check — only post author or group admin can delete
     if (
       post.author.toString() !== userId &&
-      group?.admin.toString() !== userId
+      group?.admins?.some((admin) => admin.toString() === userId) === false
     ) {
       return next(
         new AppError("You are not authorized to delete this post", 403)

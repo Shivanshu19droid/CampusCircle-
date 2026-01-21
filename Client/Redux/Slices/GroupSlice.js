@@ -271,6 +271,21 @@ export const deleteGroupPost = createAsyncThunk(
   }
 );
 
+//thunk to edit the group
+export const editGroup = createAsyncThunk("/group/edit", async({data, groupId}) => {
+  try {
+    const resPromise = axiosInstance.put(`/group/${groupId}/edit`, data);
+    const res = await toast.promise(resPromise, {
+      loading: "Updating group details...",
+      success: "Group details updated!",
+      error: "Failed to upload group details"
+    });
+    return res.data;
+  } catch(error) {
+    toast.error(error?.response?.data?.message);
+  }
+});
+
 const groupSlice = createSlice({
   name: "group",
   initialState,

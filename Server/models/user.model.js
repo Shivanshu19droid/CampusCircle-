@@ -76,9 +76,18 @@ const userSchema = new Schema(
         },
         skills: [String], //array of strings
         links: {
-            github: String,
-            linkedIn: String,
-            portfolio: String
+            github: {
+                type: String,
+                default: ""
+            },
+            linkedin: {
+                type: String,
+                default: ""
+            },
+            portfolio: {
+                type: String,
+                default: ""
+            }
         },
         role: {
             type: String,

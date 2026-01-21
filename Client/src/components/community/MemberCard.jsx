@@ -29,7 +29,7 @@ function MemberCard({
 
  return (
   <div
-    className="w-full flex items-center justify-between px-4 py-3 rounded-md cursor-pointer hover:bg-gray-200 transition-colors"
+    className="w-full flex items-center justify-between px-4 py-3 rounded-md cursor-pointer hover:bg-white/80 hover:bg-opacity-100 transition-colors"
     onClick={() => onProfileClick(memberId)}
     role="button"
     tabIndex={0}

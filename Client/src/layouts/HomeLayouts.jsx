@@ -43,7 +43,7 @@ const HomeLayout = ({ children }) => {
         <Navbar toggleSidebar={toggleSidebar} onLogoutClick={onLogoutClick}/>
 
         {/* Page Content */}
-        <main className="flex-1 px-8 py-6 mt-2 bg-white/80 backdrop-blur-sm rounded-t-3xl shadow-inner border-t border-gray-100">
+        <main className="flex-1 px-8 py-6 mt-2 backdrop-blur-sm rounded-t-3xl shadow-inner border-t border-gray-100">
           {children || <Outlet />}
         </main>
 

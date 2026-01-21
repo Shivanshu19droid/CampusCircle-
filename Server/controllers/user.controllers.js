@@ -125,6 +125,24 @@ const logoutUser = async (req, res) => {
   });
 };
 
+//this controller may be used to re-fetch the user details on refresh
+const getCurrentUser = async(req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    if(!user) {
+      return next(new AppError("No User Found", 400));
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Page refreshed",
+      user
+    });
+  } catch(error) {
+    return next(new AppError(error.message, 500));
+  }
+}
+
 const getMyProfile = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
@@ -148,7 +166,6 @@ const updateMyProfile = async (req, res, next) => {
       fullName,
       bio,
       skills,
-      links, // { github, linkedIn, portfolio }
       currentProfession,
       currentCompany,
       currentLocation,
@@ -156,11 +173,11 @@ const updateMyProfile = async (req, res, next) => {
       role,
     } = req.body;
 
+    console.log(req.body);
+
     const updatedData = {
       fullName,
       bio,
-      skills: skills ? skills.split(",").map((skill) => skill.trim()) : [],
-      links,
       currentProfession,
       currentCompany,
       currentLocation,
@@ -168,7 +185,59 @@ const updateMyProfile = async (req, res, next) => {
       role,
     };
 
-    //updating the avatar
+    // skills
+    if (skills !== undefined) {
+      updatedData.skills = skills
+        .split(",")
+        .map((skill) => skill.trim())
+        .filter(Boolean);
+    }
+
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return next(new AppError("User not found", 404));
+    }
+
+    /* =======================
+       LINKS NORMALIZATION
+    ======================= */
+
+    const linksUpdate = {};
+
+    // Case 1: Postman / FormData dotted keys (links.github)
+    for (const key in req.body) {
+      if (key.startsWith("links.")) {
+        const field = key.split(".")[1];
+        linksUpdate[field] = req.body[key];
+      }
+    }
+
+    // Case 2: JSON string (links = "{...}")
+    if (req.body.links) {
+      try {
+        const parsedLinks =
+          typeof req.body.links === "string"
+            ? JSON.parse(req.body.links)
+            : req.body.links;
+
+        Object.assign(linksUpdate, parsedLinks);
+      } catch (err) {
+        return next(new AppError("Invalid links format", 400));
+      }
+    }
+
+    if (Object.keys(linksUpdate).length > 0) {
+      updatedData.links = {
+        ...user.links.toObject(),
+        ...linksUpdate,
+      };
+    }
+
+    /* =======================
+       AVATAR UPDATE
+    ======================= */
+
     if (req.files && req.files.avatar) {
       try {
         const result = await cloudinary.v2.uploader.upload(
@@ -181,12 +250,10 @@ const updateMyProfile = async (req, res, next) => {
           }
         );
 
-        if (result) {
-          updatedData.avatar = {
-            public_id: result.public_id,
-            secure_url: result.secure_url,
-          };
-        }
+        updatedData.avatar = {
+          public_id: result.public_id,
+          secure_url: result.secure_url,
+        };
 
         fs.rm(`uploads/${req.files.avatar[0].filename}`);
       } catch (error) {
@@ -194,7 +261,10 @@ const updateMyProfile = async (req, res, next) => {
       }
     }
 
-    //updating the cover image
+    /* =======================
+       COVER IMAGE UPDATE
+    ======================= */
+
     if (req.files && req.files.coverImage) {
       try {
         const result = await cloudinary.v2.uploader.upload(
@@ -204,39 +274,43 @@ const updateMyProfile = async (req, res, next) => {
           }
         );
 
-        if (result) {
-          updatedData.coverImage = {
-            public_id: result.public_id,
-            secure_url: result.secure_url,
-          };
+        updatedData.coverImage = {
+          public_id: result.public_id,
+          secure_url: result.secure_url,
+        };
 
-          fs.rm(`uploads/${req.files.coverImage[0].filename}`);
-        }
+        fs.rm(`uploads/${req.files.coverImage[0].filename}`);
       } catch (error) {
         return next(
-          new AppError(error.message || "CoverImage Upload failed", 500)
+          new AppError(error.message || "CoverImage upload failed", 500)
         );
       }
     }
 
-    const user = await User.findByIdAndUpdate(req.user.id, updatedData, {
-      new: true,
-      runValidators: true,
-    });
+    const oldAvatarPublicId = user?.avatar?.public_id;
+    const oldCoverImagePublicId = user?.coverImage?.public_id;
 
-    if (!user) {
-      return next(new AppError("User not found", 404));
+    Object.assign(user, updatedData);
+    const updatedUser = await user.save();
+
+    if (updatedData.avatar && oldAvatarPublicId) {
+      await cloudinary.v2.uploader.destroy(oldAvatarPublicId);
+    }
+
+    if (updatedData.coverImage && oldCoverImagePublicId) {
+      await cloudinary.v2.uploader.destroy(oldCoverImagePublicId);
     }
 
     res.status(200).json({
       success: true,
       message: "Profile updated successfully",
-      user,
+      user: updatedUser,
     });
   } catch (error) {
     return next(new AppError(error.message, 500));
   }
 };
+
 
 const getUserProfile = async (req, res, next) => {
   try {
@@ -348,6 +422,7 @@ export {
   signUpUser,
   loginUser,
   logoutUser,
+  getCurrentUser,
   getMyProfile,
   updateMyProfile,
   getUserProfile,

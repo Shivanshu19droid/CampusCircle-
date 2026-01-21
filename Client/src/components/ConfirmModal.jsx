@@ -1,19 +1,16 @@
-import { useEffect } from "react";
+import { createPortal } from "react-dom";
 
 function ConfirmModal({
   isOpen,
-  message = "Are you sure you want to perform this action ? This cannot be undone!",
+  message = "Are you sure you want to perform this action? This cannot be undone!",
   onConfirm,
   onCancel,
-  title="confirmation"
+  title = "Confirmation",
 }) {
-  if (!isOpen) {
-    return null;
-  }
+  if (!isOpen) return null;
 
-
-  return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+  return createPortal(
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999]">
       {/* White box */}
       <div className="bg-white p-5 rounded-lg shadow-lg w-[300px]">
         <p className="text-sm text-gray-700">{message}</p>
@@ -34,8 +31,10 @@ function ConfirmModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
 export default ConfirmModal;
+

@@ -5,6 +5,8 @@ import Post from "../models/post.model.js";
 import AppError from "../utils/error.util.js";
 import mongoose from "mongoose";
 import QueuedPost from "../models/queuedPost.model.js";
+import fs from 'fs';
+
 
 //create a group
 const createGroup = async (req, res, next) => {
@@ -62,6 +64,8 @@ const createGroup = async (req, res, next) => {
       { $push: { groups: newGroup._id } },
       { new: true }
     );
+
+    fs.unlinkSync(req.file.path);
 
     res.status(200).json({
       succes: true,
@@ -369,7 +373,8 @@ const fetchPaginatedGroupPosts = async(req, res, next) => {
 //removing a member from the group
 const removeFromGroup = async(req, res, next) => {
   try {
-    const {groupId, userId} = req.params;
+    const {groupId, memberId} = req.params;
+    const userId = req.user.id;
     
     const group = await Group.findById(groupId);
 
@@ -377,17 +382,21 @@ const removeFromGroup = async(req, res, next) => {
       return next(new AppError("Group not found", 404));
     }
 
-    const member = await User.findById(userId);
+    const member = await User.findById(memberId);
 
     if(!member) {
       return next(new AppError('Member not found', 404));
     }
 
-    if(!group.members.some(id => id.toString() === userId.toString() || !member.groups.some(id=>id.toString()===groupId.toString()))) {
+    if(!group.admins.some(id => id.toString() === userId.toString())) {
+      return next(new AppError("Only group admins are allowed to perform this action", 403));
+    }
+
+    if(!group.members.some(id => id.toString() === memberId.toString() || !member.groups.some(id=>id.toString()===groupId.toString()))) {
       return next(new AppError(`${member.fullName} is not a member`));
     }
 
-    group.members = group.members.filter((id) => id.toString() !== userId.toString());
+    group.members = group.members.filter((id) => id.toString() !== memberId.toString());
     member.groups = member.groups.filter((id) => id.toString() !== groupId.toString());
 
     await member.save();
@@ -408,7 +417,8 @@ const removeFromGroup = async(req, res, next) => {
 //making someone group admin
 const makeAdmin = async(req, res, next) => {
   try {
-    const {groupId, userId} = req.params;
+    const {groupId, memberId} = req.params;
+    const userId = req.user.id;
 
     const group = await Group.findById(groupId);
 
@@ -416,21 +426,25 @@ const makeAdmin = async(req, res, next) => {
        return next(new AppError("Group not found", 404));
     }
 
-    const member = await User.findById(userId);
+    const member = await User.findById(memberId);
 
     if(!member) {
       return next(new AppError("Member not found", 404));
     }
 
-    if(!group.members.some(id=>id.toString() === userId.toString()) || !member.groups.some(id=>id.toString() === groupId.toString())) {
+    if(!group.members.some(id=>id.toString() === memberId.toString()) || !member.groups.some(id=>id.toString() === groupId.toString())) {
       return next(new AppError(`${member.fullName} is not a member of ${group.name}`));
     }
 
-    if(group.admins.some(id => id.toString() === userId.toString())) {
+    if(!group.admins.some(id => id.toString() === userId.toString())) {
+      return next(new AppError("Only group admins are allowed to perform this action", 403));
+    }
+
+    if(group.admins.some(id => id.toString() === memberId.toString())) {
       return next(new AppError(`${member.fullName} is already an admin`, 400));
     }
 
-    group.admins.push(userId);
+    group.admins.push(memberId);
 
     await group.save();
 
@@ -450,7 +464,8 @@ const makeAdmin = async(req, res, next) => {
 // removing someone from admin
 const removeFromAdmin = async(req, res, next) => {
   try {
-    const {groupId, userId} = req.params;
+    const {groupId, memberId} = req.params;
+    const userId = req.user.id;
 
     const group = await Group.findById(groupId);
     
@@ -458,24 +473,28 @@ const removeFromAdmin = async(req, res, next) => {
       return next(new AppError("Group not found", 404));
     };
 
-    const member = await User.findById(userId);
+    const member = await User.findById(memberId);
     if(!member) {
       return next(new AppError("Member not found", 404));
     }
 
-    if(!group.members.some(id=>id.toString() === userId.toString()) || !member.groups.some(id=>id.toString() === groupId.toString())) {
+    if(!group.members.some(id=>id.toString() === memberId.toString()) || !member.groups.some(id=>id.toString() === groupId.toString())) {
       return next(new AppError(`${member.fullName} is not a member of ${group.name}`, 400));
     }
 
-    if(!group.admins.some(id=>id.toString() === userId.toString())) {
+    if(!group.admins.some(id=>id.toString() === memberId.toString())) {
       return next(new AppError(`${member.fullName} is not an admin`, 400));
+    }
+
+    if(!group.admins.some(id=>id.toString() === userId.toString())) {
+      return next(new AppError("Only group admins are allowed to perform this action", 403));
     }
 
     if(group.admins.length <= 1) {
       return next(new AppError("cannot remove the only admin", 400));
     } 
 
-    group.admins = group.admins.filter((id) => id.toString() !== userId.toString());
+    group.admins = group.admins.filter((id) => id.toString() !== memberId.toString());
     await group.save();
 
     return res.status(200).json({
@@ -495,11 +514,23 @@ const removeFromAdmin = async(req, res, next) => {
 const fetchPaginatedQueuedPosts = async(req, res, next) => {
   try {
     const {groupId} = req.params;
+    const userId = req.user.id;
+    
+    const group = await Group.findById(groupId);
+    
+    if(!group) {
+      return next(new AppError("Group not found", 400));
+    }
+
     const {page=1, limit=10} = req.query;
 
     const pageNum = Math.max(parseInt(page, 10) || 1,1);
     const limitNum = parseInt(limit, 10);
     const skip = (pageNum - 1)*limitNum;
+
+    if(!group.admins.some(id=>id.toString() === userId.toString())) {
+      return next(new AppError("Only group admins can view queued posts", 403));
+    }
 
     const queuedPosts = await QueuedPost.find({group: groupId})
                                         .populate("author", "_id fullName avatar")
@@ -520,15 +551,81 @@ const fetchPaginatedQueuedPosts = async(req, res, next) => {
 
     const queuedPostsCount = await QueuedPost.countDocuments({group: groupId});
 
+    const groupDetails = {
+      id: group._id,
+      name: group.name,
+      icon: group.icon
+    }
+
     return res.status(200).json({
       success: true,
       queuedPosts: queuedPosts,
       hasMoreQueuedPosts: hasMore,
       page,
       limit,
-      queuedPostsCount
+      queuedPostsCount,
+      groupDetails
     });
 
+  } catch(error) {
+    return next(new AppError(error.message, 500));
+  }
+}
+
+//edit group details
+const editGroup = async(req, res, next) => {
+  try {
+    const {groupId} = req.params;
+    const userId = req.user.id;
+
+    const group = await Group.findById(groupId);
+
+    if(!group) {
+      return next(new AppError("Group not found", 404));
+    }
+
+    if(!group?.admins?.some(id => id.toString() === userId.toString())) {
+      return next(new AppError("Only group admins can edit the group", 403));
+    }
+
+    const {name, description, category} = req.body;
+
+    const oldIconPublicId = group?.icon?.public_id;
+
+    let newIcon = group.icon;
+
+    if(req.file) {
+      const uploadedImage = await cloudinary.v2.uploader.upload(req.file.path, {
+        folder: "CampusCircle/groups",
+        width: 250,
+        gravity: "faces",
+        crop: "fill",
+      });
+
+      if(uploadedImage) {
+        newIcon.public_id = uploadedImage.public_id;
+        newIcon.secure_url = uploadedImage.secure_url;      }
+    }
+
+    group.name = name? name : group.name;
+    group.description = description? description : group.description;
+    group.category = category? category : group.category;
+    group.icon = req.file? newIcon : group.icon;
+
+    const updatedGroup = await group.save();
+
+    if(req.file && oldIconPublicId) {
+      await cloudinary.v2.uploader.destroy(oldIconPublicId);
+    }
+
+    fs.unlinkSync(req.file.path);
+
+    return res.status(200).json({
+      success: true,
+      message: "Group details updated successfully",
+      updatedGroup
+    });
+      
   } catch(error) {
     return next(new AppError(error.message, 500));
   }
@@ -546,5 +643,6 @@ export {
   removeFromGroup,
   makeAdmin,
   removeFromAdmin,
-  fetchPaginatedQueuedPosts
+  fetchPaginatedQueuedPosts,
+  editGroup
 };

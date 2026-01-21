@@ -12,6 +12,7 @@ import CommentContainer from "../../components/community/CommentContainer";
 import { useNavigate } from "react-router-dom";
 import ConfirmModal from "../../components/ConfirmModal";
 import { useState } from "react";
+import HomeLayout from "../../layouts/HomeLayouts";
 
 function PostPage() {
   const dispatch = useDispatch();
@@ -49,7 +50,8 @@ function PostPage() {
   }, [postId, dispatch]);
 
   return (
-  <div className="max-w-3xl mx-auto px-4 py-6">
+  <HomeLayout>
+    <div className="max-w-3xl mx-auto px-4 py-6">
     
     {/* Back Button */}
     <button
@@ -93,6 +95,7 @@ function PostPage() {
       onCancel={() => setOpenConfirm(false)}
     />
   </div>
+  </HomeLayout>
 );
 
 

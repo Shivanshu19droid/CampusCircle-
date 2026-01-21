@@ -30,13 +30,15 @@ function GroupCard({group, isMember, onJoin, onLeave, navigateToGroup}) {
       <img
         src={groupIcon}
         alt={name}
-        className="w-14 h-14 rounded-lg object-cover border flex-shrink-0"
+        className="w-14 h-14 rounded-full object-cover border flex-shrink-0"
       />
 
       {/* Group Info */}
       <div className="flex-1 min-w-0">
         {/* Name */}
-        <h2 className="font-semibold text-lg text-gray-800 truncate">{name}</h2>
+        <h2 className="font-semibold text-lg text-gray-800 truncate">
+          {name}
+        </h2>
 
         {/* Category */}
         {category && (
@@ -65,7 +67,7 @@ function GroupCard({group, isMember, onJoin, onLeave, navigateToGroup}) {
         <button
           className="px-3 py-1 rounded-lg bg-red-600 text-white text-sm shadow-sm hover:bg-red-700"
           onClick={(e) => {
-            e.stopPropagation(); // prevent navigation to the group page
+            e.stopPropagation();
             onLeave(_id);
           }}
           aria-label="Leave group"
@@ -89,6 +91,8 @@ function GroupCard({group, isMember, onJoin, onLeave, navigateToGroup}) {
     </div>
   </div>
 );
+
+
 
 }
 

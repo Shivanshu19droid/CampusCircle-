@@ -10,6 +10,8 @@ export default function GroupPageHeader({
   onEdit,
   onDelete,
   onAdminClick,
+  onNewPost,
+  onReviewPost
 }) {
   const groupName = group?.name;
   const groupCategory = group?.category;
@@ -65,9 +67,8 @@ export default function GroupPageHeader({
                     <button
                       key={adm._id}
                       onClick={onAdminClick}
-                      className="w-10 h-10 rounded-full ring-2 ring-white overflow-hidden shadow-sm transform hover:scale-105 transition"
+                      className="w-10 h-10 rounded-full ring-2 ring-white overflow-hidden shadow-sm hover:scale-105 transition"
                       title={adm.name}
-                      aria-label={`Admin ${adm.name}`}
                       type="button"
                     >
                       <img
@@ -82,7 +83,6 @@ export default function GroupPageHeader({
                     <button
                       onClick={onAdminClick}
                       className="ml-2 text-sm px-2 py-1 rounded-md border bg-gray-100 hover:bg-gray-200"
-                      aria-label={`Show ${remainingAdminsCount} more admins`}
                       type="button"
                     >
                       +{remainingAdminsCount}
@@ -97,60 +97,65 @@ export default function GroupPageHeader({
             </div>
 
             {/* Admin-only small actions */}
-            <div className="flex-shrink-0 flex items-center gap-2">
-              {isAdmin && (
-                <>
-                  <button
-                    onClick={onEdit}
-                    className="px-3 py-2 rounded-md border bg-white text-gray-700 text-sm hover:shadow focus:outline-none focus:ring-2 focus:ring-blue-300"
-                    aria-label="Edit group"
-                    type="button"
-                  >
-                    Edit
-                  </button>
+            {isAdmin && (
+              <div className="flex gap-2">
+                <button
+                  onClick={onEdit}
+                  className="px-3 py-2 rounded-md border bg-white text-gray-700 text-sm hover:shadow"
+                  type="button"
+                >
+                  Edit
+                </button>
 
-                  <button
-                    onClick={onDelete}
-                    className="px-3 py-2 rounded-md border text-red-600 text-sm hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-200"
-                    aria-label="Delete group"
-                    type="button"
-                  >
-                    Delete
-                  </button>
-                </>
-              )}
-            </div>
+                <button
+                  onClick={onDelete}
+                  className="px-3 py-2 rounded-md border text-red-600 text-sm hover:bg-red-50"
+                  type="button"
+                >
+                  Delete
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Prominent bottom action bar */}
+      {/* Bottom action bar */}
       <div className="mt-5">
         <div className="rounded-lg overflow-hidden ring-1 ring-gray-100 bg-white shadow-sm">
           <div className="p-4 md:p-5 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              <div className="text-sm text-gray-600">
-                {isMember ? (
-                  <span className="font-medium">You're a member</span>
-                ) : (
-                  <span className="font-medium">Not a member yet</span>
-                )}{" "}
-                <span className="hidden md:inline">— join the conversation to access posts, resources, and events.</span>
-              </div>
+
+            {/* ✅ REPLACED TEXT WITH ACTION BUTTONS */}
+            <div className="flex-1 flex flex-col md:flex-row gap-3">
+              {isMember && (
+                <button
+                  className="px-5 py-3 rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition"
+                  type="button"
+                  onClick={onNewPost}
+                >
+                  Post to Group
+                </button>
+              )}
+
+              {isAdmin && (
+                <button
+                  className="px-5 py-3 rounded-md bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition"
+                  type="button"
+                  onClick={onReviewPost}
+                >
+                  Review Queued Posts
+                </button>
+              )}
             </div>
 
+            {/* Join / Leave */}
             <div className="w-full md:w-auto">
               {!isMember && (
                 <button
                   onClick={onJoin}
-                  className="w-full md:w-56 flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md hover:scale-[1.01] transform transition"
-                  aria-pressed="false"
-                  aria-label="Join group"
+                  className="w-full md:w-56 px-5 py-3 rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-semibold"
                   type="button"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
-                    <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
-                  </svg>
                   Join Group
                 </button>
               )}
@@ -158,20 +163,15 @@ export default function GroupPageHeader({
               {isMember && !isOnlyAdmin && (
                 <button
                   onClick={onLeave}
-                  className="w-full md:w-56 flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold rounded-md bg-white border border-red-300 text-red-600 hover:bg-red-50 shadow-sm transition"
-                  aria-pressed="false"
-                  aria-label="Leave group"
+                  className="w-full md:w-56 px-5 py-3 rounded-md border border-red-300 text-red-600 text-sm font-semibold hover:bg-red-50"
                   type="button"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
-                    <path fillRule="evenodd" d="M6.707 4.293a1 1 0 00-1.414 1.414L8.586 9H3a1 1 0 100 2h5.586l-3.293 3.293a1 1 0 101.414 1.414L12.414 12l-5.707-7.707z" clipRule="evenodd" />
-                  </svg>
                   Leave Group
                 </button>
               )}
 
               {isMember && isOnlyAdmin && (
-                <div className="w-full md:w-56 text-center text-sm text-gray-500 px-4 py-2 rounded-md border border-yellow-100 bg-yellow-50">
+                <div className="w-full md:w-56 px-4 py-2 rounded-md border border-yellow-100 bg-yellow-50 text-gray-500 text-sm text-center">
                   You are the only admin — transfer admin rights before leaving.
                 </div>
               )}
@@ -182,6 +182,18 @@ export default function GroupPageHeader({
     </div>
   </div>
 );
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }

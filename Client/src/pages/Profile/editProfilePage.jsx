@@ -18,42 +18,37 @@ function EditProfile() {
   const user = useSelector((state) => state.auth.data);
 
   const [userInput, setUserInput] = useState({
-  fullName: "",
-  bio: "",
-  currentProfession: "",
-  currentCompany: "",
-  currentLocation: "",
-  skills: [],
-  links: {
+    fullName: "",
+    bio: "",
+    currentProfession: "",
+    currentCompany: "",
+    currentLocation: "",
+    skills: [],
     github: "",
-    linkedIn: "",
+    linkedin: "",
     portfolio: "",
-  },
-  batch: "",
-  role: "STUDENT",
-});
+    batch: "",
+    role: "STUDENT",
+  });
 
-useEffect(() => {
-  console.log(user)
-  if (user) {
-    setUserInput({
-      fullName: user.fullName || "",
-      bio: user.bio || "",
-      currentProfession: user.currentProfession || "",
-      currentCompany: user.currentCompany || "",
-      currentLocation: user.currentLocation || "",
-      skills: user.skills || [],
-      links: {
+  useEffect(() => {
+    console.log(user);
+    if (user) {
+      setUserInput({
+        fullName: user.fullName || "",
+        bio: user.bio || "",
+        currentProfession: user.currentProfession || "",
+        currentCompany: user.currentCompany || "",
+        currentLocation: user.currentLocation || "",
+        skills: user.skills || [],
         github: user.links?.github || "",
-        linkedIn: user.links?.linkedIn || "",
+        linkedin: user.links?.linkedin || "",
         portfolio: user.links?.portfolio || "",
-      },
-      batch: user.batch || "",
-      role: user.role || "STUDENT",
-    });
-  }
-}, [user]);
-
+        batch: user.batch || "",
+        role: user.role || "STUDENT",
+      });
+    }
+  }, [user]);
 
   const [avatar, setAvatar] = useState(user?.avatar || null);
   const [coverImage, setCoverImage] = useState(user?.coverImage || null);
@@ -88,12 +83,14 @@ useEffect(() => {
     formData.append("currentProfession", userInput.currentProfession);
     formData.append("currentCompany", userInput.currentCompany);
     formData.append("currentLocation", userInput.currentLocation);
-    formData.append("skills", userInput.skills); 
-    formData.append("links", JSON.stringify(userInput.links)); 
+    formData.append("skills", userInput.skills);
+    formData.append("links.github", userInput.github);
+    formData.append("links.linkedin", userInput.linkedin);
+    formData.append("links.portfolio", userInput.portfolio);
     formData.append("batch", userInput.batch);
     formData.append("role", userInput.role);
 
-    if (avatar) formData.append("avatar", avatar); 
+    if (avatar) formData.append("avatar", avatar);
     if (coverImage) formData.append("coverImage", coverImage);
 
     const response = await dispatch(editUserProfile(formData));
@@ -105,134 +102,138 @@ useEffect(() => {
   };
 
   return (
-    <HomeLayout>
-      <div className="max-w-3xl mx-auto bg-white shadow-md rounded-xl p-8 mt-10">
-        <h2 className="text-2xl font-semibold mb-6 text-gray-800">
-          Edit Profile
-        </h2>
+  <HomeLayout>
+    <div className="max-w-3xl mx-auto bg-white shadow-md rounded-xl p-8 mt-10">
+      <h2 className="text-2xl font-semibold mb-6 text-gray-800">
+        Edit Profile
+      </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Avatar Upload */}
-          <div>
-            <label className="block text-gray-600 mb-2">Avatar</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => handleFileChange(e, "avatar")}
-              className="w-full p-2 border rounded-md"
-            />
-          </div>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Avatar Upload */}
+        <div>
+          <label className="block text-gray-600 mb-2">Avatar</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => handleFileChange(e, "avatar")}
+            className="w-full p-2 border rounded-md"
+          />
+        </div>
 
-          {/* Cover Image Upload */}
-          <div>
-            <label className="block text-gray-600 mb-2">Cover Image</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => handleFileChange(e, "cover")}
-              className="w-full p-2 border rounded-md"
-            />
-          </div>
+        {/* Cover Image Upload */}
+        <div>
+          <label className="block text-gray-600 mb-2">Cover Image</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => handleFileChange(e, "cover")}
+            className="w-full p-2 border rounded-md"
+          />
+        </div>
 
-          {/* Full Name */}
-          <div>
-            <label className="block text-gray-600 mb-2">Full Name *</label>
-            <input
-              type="text"
-              name="fullName"
-              value={userInput.fullName}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded-md"
-            />
-          </div>
+        {/* Full Name */}
+        <div>
+          <label className="block text-gray-600 mb-2">Full Name *</label>
+          <input
+            type="text"
+            name="fullName"
+            value={userInput.fullName}
+            onChange={handleInputChange}
+            className="w-full p-2 border rounded-md"
+          />
+        </div>
 
-          {/* Bio */}
-          <div>
-            <div className="flex justify-between items-center">
-              <label className="block text-gray-600 mb-2">Bio</label>
-              <button
-                onClick={() => setBioPopup(!BioPopup)}
-                type="button"
-                className="text-sm text-indigo-600 hover:underline"
-              >
-                ✨ Generate with AI
-              </button>
-              {BioPopup && <AiBioPopup
+        {/* Bio */}
+        <div>
+          <div className="flex justify-between items-center">
+            <label className="block text-gray-600 mb-2">Bio</label>
+            <button
+              onClick={() => setBioPopup(!BioPopup)}
+              type="button"
+              className="text-sm text-indigo-600 hover:underline"
+            >
+              ✨ Generate with AI
+            </button>
+            {BioPopup && (
+              <AiBioPopup
                 onDone={(generatedBio) => {
                   setUserInput({
                     ...userInput,
-                    bio: generatedBio
-                  })
-                  setBioPopup(!BioPopup)
+                    bio: generatedBio,
+                  });
+                  setBioPopup(!BioPopup);
                 }}
-                onClose = {() => setBioPopup(!BioPopup)} />}
-            </div>
-            <textarea
-              name="bio"
-              value={userInput.bio}
-              onChange={handleInputChange}
-              rows="3"
-              className="w-full p-2 border rounded-md"
-            ></textarea>
+                onClose={() => setBioPopup(!BioPopup)}
+              />
+            )}
           </div>
+          <textarea
+            name="bio"
+            value={userInput.bio}
+            onChange={handleInputChange}
+            rows="3"
+            className="w-full p-2 border rounded-md"
+          ></textarea>
+        </div>
 
-          {/* Profession / Company / Location */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <input
-              type="text"
-              name="currentProfession"
-              value={userInput.currentProfession}
-              onChange={handleInputChange}
-              placeholder="Profession"
-              className="p-2 border rounded-md"
-            />
-            <input
-              type="text"
-              name="currentCompany"
-              value={userInput.currentCompany}
-              onChange={handleInputChange}
-              placeholder="Company"
-              className="p-2 border rounded-md"
-            />
-            <input
-              type="text"
-              name="currentLocation"
-              value={userInput.currentLocation}
-              onChange={handleInputChange}
-              placeholder="Location"
-              className="p-2 border rounded-md"
-            />
-          </div>
+        {/* Profession / Company / Location */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <input
+            type="text"
+            name="currentProfession"
+            value={userInput.currentProfession}
+            onChange={handleInputChange}
+            placeholder="Profession"
+            className="p-2 border rounded-md"
+          />
+          <input
+            type="text"
+            name="currentCompany"
+            value={userInput.currentCompany}
+            onChange={handleInputChange}
+            placeholder="Company"
+            className="p-2 border rounded-md"
+          />
+          <input
+            type="text"
+            name="currentLocation"
+            value={userInput.currentLocation}
+            onChange={handleInputChange}
+            placeholder="Location"
+            className="p-2 border rounded-md"
+          />
+        </div>
 
-          {/* Skills */}
-          <div>
-            <label className="block text-gray-600 mb-2">
-              Skills (comma separated)
-            </label>
-            <input
-              type="text"
-              name="skills"
-              value={userInput.skills}
-              onChange={handleInputChange}
-              placeholder="e.g. React, Node.js, MongoDB"
-              className="w-full p-2 border rounded-md"
-            />
-          </div>
+        {/* Skills */}
+        <div>
+          <label className="block text-gray-600 mb-2">
+            Skills (comma separated)
+          </label>
+          <input
+            type="text"
+            name="skills"
+            value={userInput.skills}
+            onChange={handleInputChange}
+            placeholder="e.g. React, Node.js, MongoDB"
+            className="w-full p-2 border rounded-md"
+          />
+        </div>
 
-          {/* Links */}
+        {/* Links */}
+        <div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <input
               type="text"
               name="github"
-              value={userInput.links.github}
+              value={userInput.github}
               onChange={handleInputChange}
               placeholder="GitHub"
               className="p-2 border rounded-md"
             />
             <input
               type="text"
-              name="linkedIn"
-              value={userInput.links.linkedIn}
+              name="linkedin"
+              value={userInput.linkedin}
               onChange={handleInputChange}
               placeholder="LinkedIn"
               className="p-2 border rounded-md"
@@ -240,46 +241,55 @@ useEffect(() => {
             <input
               type="text"
               name="portfolio"
-              value={userInput.links.portfolio}
+              value={userInput.portfolio}
               onChange={handleInputChange}
               placeholder="Portfolio"
               className="p-2 border rounded-md"
             />
           </div>
 
-          {/* Batch & Role */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input
-              type="text"
-              name="batch"
-              value={userInput.batch}
-              onChange={handleInputChange}
-              placeholder="Batch (e.g. 2025)"
-              className="p-2 border rounded-md"
-            />
-            <select
-              name="role"
-              value={userInput.role}
-              onChange={handleInputChange}
-              className="p-2 border rounded-md"
-            >
-              <option value="STUDENT">Student</option>
-              <option value="ALUMNI">Alumni</option>
-              <option value="FACULTY">Faculty</option>
-            </select>
-          </div>
+          {/* HTTPS Reminder */}
+          <p className="mt-2 text-sm text-gray-500">
+            Please include the full URL starting with{" "}
+            <span className="font-medium text-gray-700">https://</span>{" "}
+            (e.g., https://github.com/username).
+          </p>
+        </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition"
+        {/* Batch & Role */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <input
+            type="text"
+            name="batch"
+            value={userInput.batch}
+            onChange={handleInputChange}
+            placeholder="Batch (e.g. 2025)"
+            className="p-2 border rounded-md"
+          />
+          <select
+            name="role"
+            value={userInput.role}
+            onChange={handleInputChange}
+            className="p-2 border rounded-md"
           >
-            Save Changes
-          </button>
-        </form>
-      </div>
-    </HomeLayout>
-  );
+            <option value="STUDENT">Student</option>
+            <option value="ALUMNI">Alumni</option>
+            <option value="FACULTY">Faculty</option>
+          </select>
+        </div>
+
+        {/* Submit */}
+        <button
+          type="submit"
+          className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition"
+        >
+          Save Changes
+        </button>
+      </form>
+    </div>
+  </HomeLayout>
+);
+
 }
 
 export default EditProfile;

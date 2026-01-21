@@ -96,10 +96,12 @@ function CommunityPage() {
   };
 
   return (
-    <HomeLayout>
-      <div className="max-w-3xl mx-auto p-4">
-        {/* ---------- TABS (Posts / Groups) ---------- */}
-        <div className="flex gap-6 border-b mb-4 pb-2">
+  <HomeLayout>
+    <div className="max-w-3xl mx-auto p-4">
+      {/* ---------- TABS + ACTION BUTTON ---------- */}
+      <div className="flex items-center justify-between border-b mb-4 pb-2">
+        {/* Tabs */}
+        <div className="flex gap-6">
           <button
             className={`pb-2 ${
               activeTab === "posts"
@@ -123,40 +125,55 @@ function CommunityPage() {
           </button>
         </div>
 
-        {/* ---------- CONDITIONAL RENDERING ---------- */}
-
-        {activeTab === "posts" ? (
-          <FeedContainer
-            posts={posts}
-            onLike={onLike}
-            onLoadMore={loadMorePosts}
-            hasMore={hasMorePosts}
-            loadingMore={loadingMorePosts}
-          />
-        ) : (
-          <GroupContainer
-            user={user}
-            groups={groups}
-            onJoin={onJoin}
-            onLeave={onLeave}
-            onLoadMore={loadMoreGroups}
-            hasMore={hasMoreGroups}
-            loadingMore={loadingMoreGroups}
-          />
-        )}
+        {/* Create Button */}
+        <button
+          onClick={() => {
+            if (activeTab === "posts") {
+              navigate("/community/create-post")
+            } else {
+              navigate("/community/new-group");
+            }
+          }}
+          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition"
+        >
+          {activeTab === "posts" ? "Create New Post" : "Create New Group"}
+        </button>
       </div>
 
-      <ConfirmModal
-        isOpen={openConfirm}
-        message="Are you sure you want to leave this group?"
-        onConfirm={() => confirmLeave(groupToLeave)}
-        onCancel={() => {
-          setOpenConfirm(false);
-          setGroupToLeave(null);
-        }}
-      ></ConfirmModal>
-    </HomeLayout>
-  );
+      {/* ---------- CONDITIONAL RENDERING ---------- */}
+      {activeTab === "posts" ? (
+        <FeedContainer
+          posts={posts}
+          onLike={onLike}
+          onLoadMore={loadMorePosts}
+          hasMore={hasMorePosts}
+          loadingMore={loadingMorePosts}
+        />
+      ) : (
+        <GroupContainer
+          user={user}
+          groups={groups}
+          onJoin={onJoin}
+          onLeave={onLeave}
+          onLoadMore={loadMoreGroups}
+          hasMore={hasMoreGroups}
+          loadingMore={loadingMoreGroups}
+        />
+      )}
+    </div>
+
+    <ConfirmModal
+      isOpen={openConfirm}
+      message="Are you sure you want to leave this group?"
+      onConfirm={() => confirmLeave(groupToLeave)}
+      onCancel={() => {
+        setOpenConfirm(false);
+        setGroupToLeave(null);
+      }}
+    />
+  </HomeLayout>
+);
+
 }
 
 export default CommunityPage;
