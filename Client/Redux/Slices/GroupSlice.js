@@ -428,6 +428,7 @@ const groupSlice = createSlice({
       .addCase(removeFromAdmin.fulfilled, (state, action) => {
         const { member } = action?.payload;
         state.admins = state.admins.filter((admin) => admin._id !== member._id);
+        state.singleGroup.admins = state.singleGroup.admins.filter((admin) => admin._id !== member._id);
         state.isLoading = false;
       })
       .addCase(removeFromAdmin.rejected, (state) => {

@@ -170,7 +170,7 @@ export default function GroupPageHeader({
                 </button>
               )}
 
-              {isMember && isOnlyAdmin && (
+              {isAdmin && isOnlyAdmin && (
                 <div className="w-full md:w-56 px-4 py-2 rounded-md border border-yellow-100 bg-yellow-50 text-gray-500 text-sm text-center">
                   You are the only admin — transfer admin rights before leaving.
                 </div>

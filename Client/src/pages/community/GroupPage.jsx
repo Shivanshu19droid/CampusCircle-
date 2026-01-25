@@ -41,7 +41,7 @@ function GroupPage() {
   const isMember = group?.members?.some((member) => member === user?._id);
   //const isOnlyAdmin = group?.admins?.length === 1 && isAdmin;
   const currAdmins = useSelector(state => state?.group?.admins);
-  const isOnlyAdmin = currAdmins.length === 1;
+  const isOnlyAdmin = currAdmins.length === 1 && isAdmin;
 
   //toggle for members and posts
   const [toggle, setToggle] = useState("posts");

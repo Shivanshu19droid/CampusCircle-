@@ -1,6 +1,7 @@
 import { formatDistanceToNow } from "date-fns";
 import { useSelector } from "react-redux";
 import { Heart, MessageCircle } from "lucide-react";
+import { useEffect } from "react";
 function PostCardFull({post, onLike, onDelete, isLiked, onCommentsClick}) {
 
     const authorName = post?.author?.fullName;
@@ -14,7 +15,12 @@ function PostCardFull({post, onLike, onDelete, isLiked, onCommentsClick}) {
 
     const user_id = useSelector((state) => state?.auth?.data?._id);
 
-    const allowedToDelete = user_id === post?.author?._id || user_id === post?.group?.admin;
+    const allowedToDelete = user_id === post?.author?._id || post?.group?.admins?.some((admin) => admin === user_id);
+
+    useEffect(() => {
+      console.log(post);
+      console.log(allowedToDelete);
+    })
 
     
 

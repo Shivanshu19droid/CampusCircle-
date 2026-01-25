@@ -1,7 +1,7 @@
 import axiosInstance from "../../src/Helpers/axiosInstance";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from "react-hot-toast";
-import { createNewGroup, joinGroup, leaveGroup } from "./GroupSlice";
+import { createNewGroup, joinGroup, leaveGroup, removeFromAdmin } from "./GroupSlice";
 import { followUser, unfollowUser } from "./ProfileSlice";
 
 const initialState = {

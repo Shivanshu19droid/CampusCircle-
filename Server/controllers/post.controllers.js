@@ -345,7 +345,7 @@ const viewPost = async(req, res, next) => {
 
     const post = await Post.findById(postId)
     .populate("author", "fullName avatar")
-    .populate("group", "name icon admin")
+    .populate("group", "name icon admins")
     .lean();
 
     if(!post) {
