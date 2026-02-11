@@ -14,7 +14,6 @@ import CommunityPage from "./pages/community/CommunityPage.jsx";
 import PostPage from "./pages/community/PostPage.jsx";
 import GroupPage from "./pages/community/GroupPage.jsx";
 import QueuedPostPage from "./pages/community/QueuedPostPage.jsx";
-import VantaLayer from "./components/VantaLayer.jsx";
 import CreatePostPage from "./pages/community/CreatePostPage.jsx";
 import CreateGroupPage from "./pages/community/CreateGroupPage.jsx";
 import { useDispatch } from "react-redux";

@@ -17,7 +17,7 @@ const messageRequestSchema = new Schema({
     },
     status: {
         type: String,
-        enum: ["pending", "accepted", "rejected"],
+        enum: ["pending", "rejected"],
         default: "pending"
     }
 }, {timestamps: true});

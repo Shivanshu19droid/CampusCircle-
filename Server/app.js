@@ -5,6 +5,9 @@ import userRoutes from "./routes/user.route.js";
 import cookieParser from "cookie-parser";
 import groupRoutes from "./routes/group.route.js";
 import postRoutes from "./routes/post.route.js";
+import chatRoutes from "./routes/Chat-Module/chat.route.js";
+import messageRequestRoutes from "./routes/Chat-Module/messageRequest.route.js";
+import messageRoutes from "./routes/Chat-Module/message.route.js";
 
 dotenv.config();
 const app = express();
@@ -29,5 +32,8 @@ app.get("/", (req, res) => {
 app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/group', groupRoutes);
 app.use('/api/v1/post', postRoutes);
+app.use('/api/v1/chat', chatRoutes);
+app.use('/api/v1/message-requests', messageRequestRoutes);
+app.use('/api/v1/message', messageRoutes);
 
 export default app;

@@ -16,6 +16,16 @@ const chatSchema = new Schema({
         type: Map,
         of: Number,
         default: {}
+    },
+    deletedFor: {
+        type: Map,
+        of: Boolean,
+        default: {}
+    },
+    clearedAt: {
+        type: Map,
+        of: Date,
+        default: {}
     }
 }, {timestamps: true});
 
