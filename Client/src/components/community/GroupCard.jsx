@@ -23,49 +23,51 @@ function GroupCard({group, isMember, onJoin, onLeave, navigateToGroup}) {
     return (
   <div
     onClick={() => navigateToGroup(_id)}
-    className="w-full border rounded-xl p-4 cursor-pointer hover:shadow-md transition bg-white flex flex-col"
+    className="w-full bg-white rounded-[24px] p-4 sm:p-5 cursor-pointer shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:scale-[1.01] transition-transform duration-200 flex flex-col"
   >
-    <div className="flex items-start gap-4">
+    <div className="flex items-start gap-3 sm:gap-4">
+      
       {/* Group Icon */}
       <img
         src={groupIcon}
         alt={name}
-        className="w-14 h-14 rounded-full object-cover border flex-shrink-0"
+        className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover flex-shrink-0"
       />
 
       {/* Group Info */}
       <div className="flex-1 min-w-0">
+        
         {/* Name */}
-        <h2 className="font-semibold text-lg text-gray-800 truncate">
+        <h2 className="font-semibold text-base sm:text-lg text-gray-800 truncate">
           {name}
         </h2>
 
         {/* Category */}
         {category && (
-          <span className="text-sm text-gray-500 capitalize block mt-1">
+          <span className="text-xs sm:text-sm text-[#064E3B] capitalize block mt-1 font-medium">
             {category}
           </span>
         )}
 
         {/* Description */}
         {trimmedDescription && (
-          <p className="text-sm text-gray-600 mt-2 line-clamp-3">
+          <p className="text-sm text-gray-600 mt-2 line-clamp-3 leading-relaxed">
             {trimmedDescription}
           </p>
         )}
 
         {/* Members count */}
-        <p className="text-xs text-gray-500 mt-2">
+        <p className="text-xs text-gray-500 mt-3">
           {members.length} member{members.length !== 1 ? "s" : ""}
         </p>
       </div>
     </div>
 
-    {/* JOIN / LEAVE BUTTON - aligned to bottom-right of card */}
-    <div className="mt-3 flex justify-end">
+    {/* JOIN / LEAVE BUTTON */}
+    <div className="mt-4 flex sm:justify-end">
       {isMember ? (
         <button
-          className="px-3 py-1 rounded-lg bg-red-600 text-white text-sm shadow-sm hover:bg-red-700"
+          className="w-full sm:w-auto px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-colors"
           onClick={(e) => {
             e.stopPropagation();
             onLeave(_id);
@@ -77,7 +79,7 @@ function GroupCard({group, isMember, onJoin, onLeave, navigateToGroup}) {
         </button>
       ) : (
         <button
-          className="px-3 py-1 rounded-lg bg-blue-600 text-white text-sm shadow-sm hover:bg-blue-700"
+          className="w-full sm:w-auto px-4 py-2 rounded-full bg-[#FF6B35] text-white text-sm font-medium hover:opacity-90 transition-all"
           onClick={(e) => {
             e.stopPropagation();
             onJoin(_id);
@@ -91,6 +93,8 @@ function GroupCard({group, isMember, onJoin, onLeave, navigateToGroup}) {
     </div>
   </div>
 );
+
+
 
 
 

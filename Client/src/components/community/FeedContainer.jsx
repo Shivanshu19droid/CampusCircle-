@@ -38,27 +38,37 @@ function FeedContainer({ posts, onLike, onLoadMore, hasMore, loadingMore }) {
   }, [hasMore]);
 
   return (
-    <div className="space-y-4">
-      {posts.map((post) => (
-        <div key={post._id}>
-          <PostCard
-            post={post}
-            onLike={onLike}
-            navigateToPost={navigateToPost}
-            navigateToComments={navigateToComments}
-          />
-        </div>
-      ))}
+  <div className="flex flex-col gap-6 px-4 sm:px-0">
+    
+    {posts.map((post) => (
+      <div
+        key={post._id}
+        className="hover:scale-[1.01] transition-transform duration-200"
+      >
+        <PostCard
+          post={post}
+          onLike={onLike}
+          navigateToPost={navigateToPost}
+          navigateToComments={navigateToComments}
+        />
+      </div>
+    ))}
 
-      {/* Infinite scroll sentinel */}
-      <div ref={bottomRef} className="h-10"></div>
+    {/* Infinite scroll sentinel */}
+    <div ref={bottomRef} className="h-10"></div>
 
-      {/* Loading more indicator */}
-      {loadingMore && (
-        <p className="text-center py-4 text-gray-500">Loading more posts...</p>
-      )}
-    </div>
-  );
+    {/* Loading more indicator */}
+    {loadingMore && (
+      <div className="text-center py-6">
+        <p className="text-sm text-gray-500 animate-pulse">
+          Loading more posts...
+        </p>
+      </div>
+    )}
+
+  </div>
+);
+
 }
 
 
