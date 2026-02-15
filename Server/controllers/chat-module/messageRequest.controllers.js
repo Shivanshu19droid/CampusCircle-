@@ -12,7 +12,6 @@ const createNewMessageRequest = async (req, res, next) => {
     const { clickedUserId } = req.params;
     const { content } = req.body;
 
-    //basic validation
     if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
       return next(new AppError("Invalid User Id", 400));
     }
@@ -25,11 +24,8 @@ const createNewMessageRequest = async (req, res, next) => {
       return next(new AppError("Message cannot be empty", 400));
     }
 
-    //check if chat already exists
     const existingChat = await Chat.findOne({
-      participants: {
-        $all: [userId, clickedUserId],
-      },
+      participants: { $all: [userId, clickedUserId] },
     }).select("_id");
 
     if (existingChat) {
@@ -38,7 +34,6 @@ const createNewMessageRequest = async (req, res, next) => {
       );
     }
 
-    //check if there is a mutual follow
     const user = await User.findById(userId);
     if (!user) {
       return next(new AppError("User not found", 404));
@@ -47,6 +42,7 @@ const createNewMessageRequest = async (req, res, next) => {
     const followedByUser = user.following?.some(
       (id) => id.toString() === clickedUserId,
     );
+
     const followsBackUser = user.followers?.some(
       (id) => id.toString() === clickedUserId,
     );
@@ -57,43 +53,63 @@ const createNewMessageRequest = async (req, res, next) => {
       );
     }
 
-    // check if message request already exists
     const existingRequest = await MessageRequest.findOne({
       $or: [
-        {sender: userId, receiver: clickedUserId},
-        {sender: clickedUserId, receiver: userId}
-      ]
+        { sender: userId, receiver: clickedUserId },
+        { sender: clickedUserId, receiver: userId },
+      ],
     });
 
+    const io = req.app.get("io");
+    const onlineUsers = getOnlineUsers();
+    const receiverSocketId = onlineUsers.get(clickedUserId);
+
+    // 🔥 CASE 1: Re-sending rejected request
     if (existingRequest) {
-      if(existingRequest.status === "rejected") {
+      if (existingRequest.status === "rejected") {
         existingRequest.status = "pending";
         existingRequest.content = content;
-        existingRequest.sender = userId;
-        existingRequest.receiver = clickedUserId;
+        existingRequest.sender = new mongoose.Types.ObjectId(userId);
+        existingRequest.receiver = new mongoose.Types.ObjectId(clickedUserId);
+
         await existingRequest.save();
+
+        // 🔥 SOCKET EMIT
+        if (receiverSocketId) {
+          io.to(receiverSocketId).emit(
+            "MESSAGE_REQUEST_RECEIVED",
+            existingRequest,
+          );
+        }
 
         return res.status(200).json({
           success: true,
           message: "Message request sent successfully",
-          existingRequest
+          existingRequest,
         });
       }
+
       return next(new AppError("Message request already exists", 400));
     }
 
-    const newMessageRequest = new MessageRequest({
+    // 🔥 CASE 2: New request
+    const newMessageRequest = await MessageRequest.create({
       sender: userId,
       receiver: clickedUserId,
-      content: content,
+      content,
       status: "pending",
     });
 
-    await newMessageRequest.save();
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit(
+        "MESSAGE_REQUEST_RECEIVED",
+        newMessageRequest,
+      );
+    }
 
     return res.status(200).json({
       success: true,
-      message: "Message request send successfully",
+      message: "Message request sent successfully",
       newMessageRequest,
     });
   } catch (error) {
@@ -119,7 +135,7 @@ const getAllSentRequests = async (req, res, next) => {
     const sentRequests = await MessageRequest.aggregate([
       {
         $match: {
-          sender: new mongoose.Types.ObjectId(userId)
+          sender: new mongoose.Types.ObjectId(userId),
         },
       },
       {
@@ -141,7 +157,7 @@ const getAllSentRequests = async (req, res, next) => {
       },
       {
         $unwind: {
-          path: "$receiver"
+          path: "$receiver",
         },
       },
       {
@@ -215,7 +231,7 @@ const getAllReceivedRequests = async (req, res, next) => {
       },
       {
         $unwind: {
-          path: "$sender"
+          path: "$sender",
         },
       },
       {
@@ -273,7 +289,9 @@ const cancelSentRequest = async (req, res, next) => {
       return next(new AppError("Request not found", 404));
     }
 
-    await MessageRequest.deleteOne({ _id: new mongoose.Types.ObjectId(requestId) });
+    await MessageRequest.deleteOne({
+      _id: new mongoose.Types.ObjectId(requestId),
+    });
 
     //return event to the front end using socket.io
 
@@ -293,14 +311,13 @@ const acceptMessageRequest = async (req, res, next) => {
     const userId = req.user.id;
     const { requestId } = req.params;
 
-    //basic validation
     if (!requestId || !mongoose.Types.ObjectId.isValid(requestId)) {
       return next(new AppError("Invalid request id", 400));
     }
 
     const request = await MessageRequest.findOne({
-      _id: mongoose.Types.ObjectId(requestId),
-      receiver: mongoose.Types.ObjectId(userId),
+      _id: new mongoose.Types.ObjectId(requestId),
+      receiver: new mongoose.Types.ObjectId(userId),
       status: "pending",
     });
 
@@ -309,14 +326,15 @@ const acceptMessageRequest = async (req, res, next) => {
     }
 
     let chat = await Chat.findOne({
-      participants: {
-        $all: [request.sender, userId],
-      },
+      participants: { $all: [request.sender, userId] },
     });
 
     if (!chat) {
       chat = await Chat.create({
-        participants: [request.sender, new mongoose.Types.ObjectId(userId)],
+        participants: [
+          request.sender,
+          new mongoose.Types.ObjectId(userId),
+        ],
       });
     }
 
@@ -333,7 +351,24 @@ const acceptMessageRequest = async (req, res, next) => {
 
     await chat.save();
 
-    await MessageRequest.deleteOne({ _id: new mongoose.Types.ObjectId(requestId) });
+    await MessageRequest.deleteOne({
+      _id: new mongoose.Types.ObjectId(requestId),
+    });
+
+    // 🔥 SOCKET EMIT HERE
+    const io = req.app.get("io");
+    const onlineUsers = getOnlineUsers();
+
+    const senderSocketId = onlineUsers.get(
+      request.sender.toString()
+    );
+
+    if (senderSocketId) {
+      io.to(senderSocketId).emit("MESSAGE_REQUEST_ACCEPTED", {
+        chat,
+        message: newMessage,
+      });
+    }
 
     return res.status(200).json({
       success: true,
@@ -341,19 +376,21 @@ const acceptMessageRequest = async (req, res, next) => {
       chat,
       newMessage,
     });
+
   } catch (error) {
     return next(new AppError(error.message || "Something went wrong", 500));
   }
 };
 
+
 //reject message request
-const rejectMessageRequest = async(req, res, next) => {
+const rejectMessageRequest = async (req, res, next) => {
   try {
     const userId = req.user.id;
     const { requestId } = req.params;
 
     //basic validation
-    if(!requestId || !mongoose.Types.ObjectId.isValid(requestId)) {
+    if (!requestId || !mongoose.Types.ObjectId.isValid(requestId)) {
       return next(new AppError("Invalid request Id", 404));
     }
 
@@ -363,10 +400,10 @@ const rejectMessageRequest = async(req, res, next) => {
     const request = await MessageRequest.findOne({
       _id: requestObjectId,
       receiver: userObjectId,
-      status: "pending"
+      status: "pending",
     });
 
-    if(!request) {
+    if (!request) {
       return next(new AppError("Request not found", 404));
     }
 
@@ -378,11 +415,9 @@ const rejectMessageRequest = async(req, res, next) => {
     return res.status(200).json({
       success: true,
       message: "Request has been rejected successfully",
-      request
+      request,
     });
-
-
-  } catch(error) {
+  } catch (error) {
     return next(new AppError(error.message || "Something went wrong", 500));
   }
 };
@@ -393,5 +428,5 @@ export {
   getAllReceivedRequests,
   cancelSentRequest,
   acceptMessageRequest,
-  rejectMessageRequest
-}
+  rejectMessageRequest,
+};

@@ -37,6 +37,8 @@ const io = new Server(server, {
     }
 });
 
+export { io };
+
 // socket based connection
 initSocket(io);
 app.set("io", io);
