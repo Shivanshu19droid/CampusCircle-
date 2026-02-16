@@ -8,6 +8,7 @@ export const initSocket = (io) => {
         // 🔹 Register logged-in user
         socket.on("REGISTER_USER", (userId) => {
             onlineUsers.set(userId, socket.id);
+            console.log("Registered user:", userId);
         });
 
         // 🔹 Join chat room

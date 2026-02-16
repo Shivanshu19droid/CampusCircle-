@@ -89,4 +89,103 @@ const sendMessage = async (req, res, next) => {
   }
 };
 
-export default sendMessage;
+const getAllMessagesFromChat = async (req, res, next) => {
+  try {
+    const { chatId } = req.params;
+    const userId = req.user.id;
+    const { page = 1, limit = 20 } = req.query;
+
+    const limitNum = Math.min(parseInt(limit, 10) || 20, 50);
+    const pageNum = Math.max(parseInt(page, 10) || 1, 1);
+    const skip = (pageNum - 1) * limitNum;
+
+    // ✅ Basic validation
+    if (!chatId || !mongoose.Types.ObjectId.isValid(chatId)) {
+      return next(new AppError("Invalid chat Id", 400));
+    }
+
+    const chatObjectId = new mongoose.Types.ObjectId(chatId);
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+
+    // ✅ Fetch chat & validate participant
+    const chat = await Chat.findOne({
+      _id: chatObjectId,
+      participants: userObjectId,
+    }).select("participants");
+
+    if (!chat) {
+      return next(new AppError("You are not authorized to access this chat", 403));
+    }
+
+    // ✅ Extract receiverId (other participant)
+    const receiverId = chat.participants.find(
+      (participant) => participant.toString() !== userId
+    );
+
+    const receiverObjectId = new mongoose.Types.ObjectId(receiverId);
+
+    // ✅ Aggregation
+    const result = await Message.aggregate([
+      {
+        $match: {
+          chat: chatObjectId,
+        },
+      },
+      {
+        $sort: { createdAt: -1 },
+      },
+      {
+        $facet: {
+          messages: [
+            { $skip: skip },
+            { $limit: limitNum },
+            {
+              $addFields: {
+                direction: {
+                  $cond: [
+                    { $eq: ["$sender", userObjectId] },
+                    "sent",
+                    "received",
+                  ],
+                },
+              },
+            },
+            {
+              $project: {
+                sender: 1,
+                receiver: 1,
+                content: 1,
+                attachments: 1,
+                createdAt: 1,
+                direction: 1,
+              },
+            },
+          ],
+          totalCount: [{ $count: "count" }],
+        },
+      },
+    ]);
+
+    const messages = result[0]?.messages || [];
+    const totalMessages = result[0]?.totalCount[0]?.count || 0;
+
+    res.status(200).json({
+      status: "success",
+      currentPage: pageNum,
+      totalPages: Math.ceil(totalMessages / limitNum),
+      totalMessages,
+      results: messages.length,
+      data: messages,
+    });
+
+  } catch (error) {
+    return next(new AppError(error.message || "Something went wrong", 500));
+  }
+};
+
+
+
+export {
+  sendMessage,
+  getAllMessagesFromChat,
+};
