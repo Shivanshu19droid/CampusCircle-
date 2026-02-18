@@ -372,10 +372,13 @@ const createNewChat = async (req, res, next) => {
 
     await chat.save();
 
+    const messageObject = newMessage.toObject();
+    messageObject.direction = "sent";
+
     return res.status(200).json({
       success: true,
       chat,
-      newMessage,
+      newMessage: messageObject
     });
   } catch (error) {
     return next(new AppError(error.message || "Something went wrong", 500));
@@ -438,6 +441,7 @@ const markChatAsRead = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       chatId,
+      userId: userId,
       unreadCount: chat.unreadCount.get(userId),
     });
   } catch (error) {
