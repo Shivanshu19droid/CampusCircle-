@@ -1,10 +1,8 @@
 // src/socket.js
 import { io } from "socket.io-client";
 
-const backend_development_url = "http://localhost:5000";
-const backend_production_url = "";
 
-const socket = io(backend_development_url || backend_production_url, {
+const socket = io(import.meta.env.VITE_BACKEND_URL, {
   withCredentials: true,
 });
 

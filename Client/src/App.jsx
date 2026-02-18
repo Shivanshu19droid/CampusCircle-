@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Home from "./pages/HomePage.jsx";
 import HomeLayout from "./layouts/HomeLayouts.jsx";
 import LoginFunc from "./pages/Auth/loginPage.jsx";
-import { Provider } from "react-redux";
+import { Provider, useSelector } from "react-redux";
 import { Toaster } from "react-hot-toast";
 import store from "../Redux/store.js";
 import SignUpFunc from "./pages/Auth/signupPage.jsx";
@@ -20,44 +20,58 @@ import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { fetchCurrentUser } from "../Redux/Slices/AuthSlice.js";
 import EditGroupPage from "./pages/community/EditGroupPage.jsx";
-
-
+import socket from "./socket.js";
 
 function App() {
-
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(fetchCurrentUser());
   }, [dispatch]);
-  
+
+  const user = useSelector((state) => state.auth.data);
+
+  useEffect(() => {
+    if (user?._id) {
+      socket.emit("REGISTER_USER", user._id);
+    }
+  }, [user]);
 
   return (
-       <BrowserRouter>
-       {/* VANTA BACKGROUND — mounted ONCE */}
-       
-         <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<LoginFunc />} />
-            <Route path="/register" element={<SignUpFunc />} />
-            <Route path="/view-profile/:id" element={<ViewProfile />} />
-            
-            <Route path="/edit-profile" element={<ProtectedRoutes>
+    <BrowserRouter>
+      {/* VANTA BACKGROUND — mounted ONCE */}
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<LoginFunc />} />
+        <Route path="/register" element={<SignUpFunc />} />
+        <Route path="/view-profile/:id" element={<ViewProfile />} />
+
+        <Route
+          path="/edit-profile"
+          element={
+            <ProtectedRoutes>
               <EditProfile />
-            </ProtectedRoutes>} 
-            />
-            <Route path="/community" element={<CommunityPage />} />
-            <Route path="/community/posts/:postId" element={<PostPage/>} />
-            <Route path="/community/groups/:groupId" element={<GroupPage/>} />
-            <Route path="/community/:groupId/queued-posts" element={<QueuedPostPage />} />
-            <Route path="/community/create-post" element={<CreatePostPage />} />
-            <Route path="/community/new-group" element={<CreateGroupPage />} />
-            <Route path="/community/:groupId/edit-group" element={<EditGroupPage />} />
-            
-         </Routes>
-         <Toaster />
+            </ProtectedRoutes>
+          }
+        />
+        <Route path="/community" element={<CommunityPage />} />
+        <Route path="/community/posts/:postId" element={<PostPage />} />
+        <Route path="/community/groups/:groupId" element={<GroupPage />} />
+        <Route
+          path="/community/:groupId/queued-posts"
+          element={<QueuedPostPage />}
+        />
+        <Route path="/community/create-post" element={<CreatePostPage />} />
+        <Route path="/community/new-group" element={<CreateGroupPage />} />
+        <Route
+          path="/community/:groupId/edit-group"
+          element={<EditGroupPage />}
+        />
+      </Routes>
+      <Toaster />
     </BrowserRouter>
-  )
+  );
 }
 
 export default App;
