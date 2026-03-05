@@ -48,14 +48,23 @@ function GroupContainer({
   }, [hasMore]);
 
   return (
-  <div className="space-y-6 w-full">
+  <div className="space-y-10 w-full">
 
     {/* Joined Groups */}
     {joinedGroups.length > 0 && (
       <section>
-        <h2 className="text-lg font-semibold mb-3">Your Groups</h2>
+        <h2 className="text-lg font-semibold mb-4 text-slate-900">
+          Your Groups
+        </h2>
 
-        <div className="w-full flex flex-col gap-3">
+        <div
+          className="
+            grid
+            grid-cols-1
+            md:grid-cols-2
+            gap-6
+          "
+        >
           {joinedGroups.map((group) => (
             <GroupCard
               key={group._id}
@@ -72,9 +81,18 @@ function GroupContainer({
 
     {/* Explore Groups */}
     <section>
-      <h2 className="text-lg font-semibold mb-3">Explore Groups</h2>
+      <h2 className="text-lg font-semibold mb-4 text-slate-900">
+        Explore Groups
+      </h2>
 
-      <div className="w-full flex flex-col gap-3">
+      <div
+        className="
+          grid
+          grid-cols-1
+          md:grid-cols-2
+          gap-6
+        "
+      >
         {otherGroups.map((group) => (
           <GroupCard
             key={group._id}
@@ -93,10 +111,11 @@ function GroupContainer({
 
     {/* Loading indicator */}
     {loadingMore && (
-      <p className="text-center text-gray-500 py-4">
+      <p className="text-center text-slate-500 py-4">
         Loading more groups...
       </p>
     )}
+
   </div>
 );
 

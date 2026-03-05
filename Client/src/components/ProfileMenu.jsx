@@ -38,14 +38,14 @@ const ProfileMenu = ({onLogoutClick}) => {
         <p className="text-gray-700 text-base mb-2">
           Your campus network is waiting,
         </p>
-        <p className="text-indigo-600 font-bold text-lg uppercase mb-4">
+        <p className="text-indigo-900 font-bold text-lg uppercase mb-4">
           Sign in now to explore!
         </p>
 
         {/* Login button */}
         <Link
           to="/login"
-          className="block bg-indigo-600 text-white text-sm py-3 px-6 rounded-xl font-semibold shadow-md hover:bg-indigo-700 transition-all"
+          className="block bg-gradient-to-b from-indigo-900 to-[#2E2A8C] text-white text-sm py-3 px-6 rounded-xl font-semibold shadow-md hover:from-indigo-800 hover:to-indigo-700 transition-all"
         >
           Login
         </Link>
@@ -53,46 +53,101 @@ const ProfileMenu = ({onLogoutClick}) => {
     );
   }
   
-  return (
-    (
-    <>
-     <div className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-lg p-4 border border-gray-100 animate-fadeIn">
-      <div className="flex items-center gap-3 mb-3 pb-3 border-b border-gray-100">
+ return (
+  <>
+    <div
+      className="
+        absolute right-0 mt-3
+        w-64
+        bg-white
+        rounded-2xl
+        border border-slate-200
+        shadow-[0_8px_24px_rgba(0,0,0,0.08)]
+        p-5
+        text-center
+        animate-fadeIn
+        z-50
+      "
+    >
+      {/* Avatar */}
+      <div className="flex justify-center mb-4">
         <img
-          src={user?.avatar?.secure_url? user.avatar.secure_url : "https://cdn-icons-png.flaticon.com/512/847/847969.png"}
+          src={
+            user?.avatar?.secure_url
+              ? user.avatar.secure_url
+              : "https://cdn-icons-png.flaticon.com/512/847/847969.png"
+          }
           alt="Profile"
-          className="w-10 h-10 rounded-full ring-2 ring-indigo-100"
+          className="
+            w-16 h-16
+            rounded-full
+            object-cover
+            border border-slate-200
+          "
         />
-        <div>
-          <h4 className="font-medium text-gray-800 text-sm">{user.fullName}</h4>
-          <p className="text-xs text-gray-500"> {user?.currentProfession && user?.currentCompany ? `${user.currentProfession} at ${user.currentCompany}` : "CampusCircle User"} </p>
-        </div>
       </div>
 
+      {/* Name */}
+      <h4 className="text-base font-semibold text-slate-900">
+        {user.fullName}
+      </h4>
+
+      {/* Profession */}
+      <p className="text-slate-500 text-xs mt-1 mb-4">
+        {user?.currentProfession && user?.currentCompany
+          ? `${user.currentProfession} at ${user.currentCompany}`
+          : "CampusCircle User"}
+      </p>
+
+      {/* Divider */}
+      <div className="h-px bg-slate-200 mb-4" />
+
+      {/* View Profile Button */}
       <Link
         to={`/view-profile/${user?._id}`}
-        className="block text-sm text-gray-700 hover:text-indigo-600 mb-2 transition-colors"
+        className="
+          block w-full
+          py-2 mb-2
+          rounded-lg
+          text-sm font-semibold
+          text-white
+          bg-gradient-to-b from-indigo-900 to-[#2E2A8C]
+          hover:opacity-95
+          transition-all duration-200
+        "
       >
         View Profile
       </Link>
-      <button onClick={onLogoutClick}className="text-sm text-red-500 hover:text-red-600 transition-colors">
-        Logout
-      </button>
 
-      
+      {/* Logout Button */}
+      <button
+        onClick={onLogoutClick}
+        className="
+          w-full
+          py-2
+          rounded-lg
+          text-sm font-medium
+          text-slate-600
+          border border-slate-300
+          hover:bg-slate-50
+          transition-all duration-200
+        "
+      >
+        Log Out
+      </button>
     </div>
 
-    {/* <ConfirmModal
-       isOpen = {openConfirm}
-       message = "Are you sure you want to logout?"
-       onConfirm = {handleLogout}
-       onCancel = {() => setOpenConfirm(false)}
-      /> */}
-
-    </> 
-     
-    )
-  );
+    {/* Optional Confirm Modal */}
+    {/* 
+    <ConfirmModal
+      isOpen={openConfirm}
+      message="Are you sure you want to logout?"
+      onConfirm={handleLogout}
+      onCancel={() => setOpenConfirm(false)}
+    />
+    */}
+  </>
+);
 };
 
 export default ProfileMenu;

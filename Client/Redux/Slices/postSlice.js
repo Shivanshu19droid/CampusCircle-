@@ -36,14 +36,14 @@ export const createPost = createAsyncThunk("/posts/create-new", async(data) => {
 //like-unlike post action
 export const likeUnlikePost = createAsyncThunk("/posts/like-unlike-post", async(postId) => {
     try {
-      const resPromise = axiosInstance.put(`/post/like-unlike/${postId}`);
-      const res = await toast.promise(resPromise, {
-        loading: "Updating like status",
-        success: (res) => {
-            return res?.data?.message;
-        },
-        error: "Failed to update like status"
-      });
+      const res = await axiosInstance.put(`/post/like-unlike/${postId}`);
+    //   const res = await toast.promise(resPromise, {
+    //     loading: "Updating like status",
+    //     success: (res) => {
+    //         return res?.data?.message;
+    //     },
+    //     error: "Failed to update like status"
+    //   });
       return res.data;
     } catch(error) {
         toast.error(error?.response?.data?.message);

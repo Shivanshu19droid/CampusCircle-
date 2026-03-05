@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { generateBioWithAI } from "../../../Redux/Slices/ProfileSlice";
 import { useNavigate } from "react-router-dom";
+import { createPortal } from "react-dom";
 
 function AiBioPopup({ onDone, onClose }) {
   const dispatch = useDispatch();
@@ -44,99 +45,153 @@ function AiBioPopup({ onDone, onClose }) {
     }
   };
 
-  return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-      <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md relative">
-        {/* Close button */}
-        <button
-          type="button"
-          className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
-          onClick={onClose}
-        >
-          ✕
-        </button>
+  return createPortal(
+  <>
+    <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50 px-4">
 
-        <h2 className="text-lg font-semibold mb-4 text-gray-800">
-          ✨ Generate Your Bio with AI
-        </h2>
+      <div className="w-full max-w-lg bg-gradient-to-b from-indigo-900 to-[#2E2A8C] rounded-2xl shadow-[0_25px_40px_-10px_rgba(0,0,0,0.5)] overflow-hidden relative text-white">
 
-        {/* Input fields */}
-        <div className="space-y-3 mb-4">
-          <input
-            type="text"
-            name="role"
-            value={bioInput.role}
-            onChange={handleBioInputChange}
-            placeholder="Role (e.g. Frontend Developer)"
-            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          />
-          <input
-            type="text"
-            name="experience"
-            value={bioInput.experience}
-            onChange={handleBioInputChange}
-            placeholder="Experience (e.g. 1 year, beginner, etc.)"
-            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          />
-          <input
-            type="text"
-            name="skills"
-            value={bioInput.skills}
-            onChange={handleBioInputChange}
-            placeholder="Key Skills (comma separated)"
-            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          />
-          <input
-            type="text"
-            name="highlights"
-            value={bioInput.highlights}
-            onChange={handleBioInputChange}
-            placeholder="Highlights / Achievements"
-            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          />
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-5 border-b border-white/20">
+          <h2 className="text-lg font-semibold">
+            Generate Bio
+          </h2>
+
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-white/70 hover:text-white text-xl"
+          >
+            ✕
+          </button>
         </div>
 
-        {/* Generated bio section */}
-        {generatedBio && (
-          <div className="bg-gray-50 p-3 rounded-md border border-gray-200 mb-4">
-            <p className="text-gray-700 whitespace-pre-line">{generatedBio}</p>
-          </div>
-        )}
+        <div className="px-6 py-6">
 
-        {/* Buttons */}
-        <div className="flex justify-end gap-3">
-          {!generatedBio ? (
+          {/* INPUTS */}
+          <div className="space-y-4 mb-6">
+
+            {/* Role */}
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-white/90">
+                Role
+              </label>
+
+              <input
+                type="text"
+                name="role"
+                value={bioInput.role}
+                onChange={handleBioInputChange}
+                placeholder="Role (e.g. Frontend Developer)"
+                className="w-full px-4 py-2.5 border border-white/20 bg-white rounded-lg text-sm text-slate-800 outline-none focus:ring-2 focus:ring-white transition"
+              />
+            </div>
+
+            {/* Experience */}
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-white/90">
+                Experience
+              </label>
+
+              <input
+                type="text"
+                name="experience"
+                value={bioInput.experience}
+                onChange={handleBioInputChange}
+                placeholder="Experience (e.g. 1 year, beginner)"
+                className="w-full px-4 py-2.5 border border-white/20 bg-white rounded-lg text-sm text-slate-800 outline-none focus:ring-2 focus:ring-white transition"
+              />
+            </div>
+
+            {/* Skills */}
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-white/90">
+                Key Skills
+              </label>
+
+              <input
+                type="text"
+                name="skills"
+                value={bioInput.skills}
+                onChange={handleBioInputChange}
+                placeholder="Key Skills (comma separated)"
+                className="w-full px-4 py-2.5 border border-white/20 bg-white rounded-lg text-sm text-slate-800 outline-none focus:ring-2 focus:ring-white transition"
+              />
+            </div>
+
+            {/* Highlights */}
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-white/90">
+                Key Highlights
+              </label>
+
+              <input
+                type="text"
+                name="highlights"
+                value={bioInput.highlights}
+                onChange={handleBioInputChange}
+                placeholder="Highlights / Achievements"
+                className="w-full px-4 py-2.5 border border-white/20 bg-white rounded-lg text-sm text-slate-800 outline-none focus:ring-2 focus:ring-white transition"
+              />
+            </div>
+
+          </div>
+
+          {/* Generate button */}
+          {!generatedBio && (
             <button
               type="button"
               onClick={handleGenerateButton}
               disabled={loading}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-60"
+              className="w-full py-2.5 rounded-lg bg-white text-indigo-900 font-semibold hover:bg-slate-100 transition mb-6 disabled:opacity-60"
             >
-              {loading ? "Generating..." : "Generate"}
+              {loading ? "Generating..." : "Generate with AI"}
             </button>
-          ) : (
+          )}
+
+          {/* Generated Bio */}
+          {generatedBio && (
             <>
-              <button
-                type="button"
-                onClick={handleGenerateButton}
-                disabled={loading}
-                className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 disabled:opacity-60"
-              >
-                {loading ? "Regenerating..." : "Regenerate"}
-              </button>
-              <button
-                type="button"
-                onClick={() => onDone(generatedBio)}
-                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-              >
-                Done
-              </button>
+              <div className="border-t border-white/20 pt-5 mb-5">
+                <h3 className="text-sm font-semibold mb-2">
+                  Generated Bio
+                </h3>
+
+                <div className="bg-white/95 border border-white/20 rounded-lg p-4 text-sm text-slate-800 whitespace-pre-line">
+                  {generatedBio}
+                </div>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex gap-3">
+
+                <button
+                  type="button"
+                  onClick={handleGenerateButton}
+                  disabled={loading}
+                  className="flex-1 py-2.5 rounded-lg border border-white/30 text-white hover:bg-white/10 transition disabled:opacity-60"
+                >
+                  {loading ? "Regenerating..." : "Regenerate"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => onDone(generatedBio)}
+                  className="flex-1 py-2.5 rounded-lg bg-white text-indigo-900 font-semibold hover:bg-slate-100 transition"
+                >
+                  Use Bio
+                </button>
+
+              </div>
             </>
           )}
+
         </div>
       </div>
     </div>
-  );
+  </>,
+  document.body
+);
 }
 
 export default AiBioPopup;

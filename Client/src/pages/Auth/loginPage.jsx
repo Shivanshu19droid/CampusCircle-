@@ -51,69 +51,109 @@ function LoginFunc() {
 
     }
 
-    return (
-  <HomeLayout>
-    <div className="flex items-center justify-center h-[calc(100vh-6rem)] bg-gradient-to-br from-indigo-50 via-amber-50 to-white">
-      <div className="bg-white/90 backdrop-blur-md shadow-xl rounded-2xl p-8 w-[90%] max-w-md border border-gray-100">
-        <h2 className="text-3xl font-bold text-center text-indigo-600 mb-2 tracking-tight">
-          Welcome Back 👋
-        </h2>
-        <p className="text-center text-gray-500 mb-8">
-          Login to your <span className="font-medium text-indigo-600">CampusCircle</span> account
+   return (
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 px-4">
+
+    <div className="w-full max-w-md bg-white rounded-2xl shadow-[0_25px_40px_-10px_rgba(0,0,0,0.4)] overflow-hidden">
+
+      {/* Header */}
+      <div className="px-8 pt-8 pb-6 border-b border-slate-200 text-center">
+
+        <div className="flex items-center justify-center gap-2 mb-3">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-b from-indigo-900 to-[#2E2A8C] text-white flex items-center justify-center font-semibold">
+            C
+          </div>
+          <span className="text-lg font-semibold text-slate-900">
+            CampusCircle
+          </span>
+        </div>
+
+        <p className="text-sm text-slate-500 mb-2">
+          Connect. Learn. Thrive.
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Email Field */}
+        <h2 className="text-3xl font-bold text-slate-900">
+          Welcome Back!
+        </h2>
+
+        <p className="text-sm text-slate-500 mt-1">
+          Please sign in to your account.
+        </p>
+
+      </div>
+
+      {/* Form */}
+      <div className="px-8 py-8">
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+
+          {/* Email */}
           <div>
-            <label className="block text-gray-700 mb-1 font-medium text-sm">
+            <label className="block text-sm font-medium text-slate-700 mb-1">
               Email
             </label>
+
             <input
               type="email"
               name="email"
               value={userInput.email}
               onChange={handleUserInput}
               placeholder="Enter your email"
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-300 bg-gray-50/60 transition"
+              className="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-900 focus:border-indigo-900 transition"
             />
           </div>
 
-          {/* Password Field */}
+          {/* Password */}
           <div>
-            <label className="block text-gray-700 mb-1 font-medium text-sm">
-              Password
-            </label>
+            <div className="flex justify-between items-center mb-1">
+              <label className="text-sm font-medium text-slate-700">
+                Password
+              </label>
+
+              <button
+                type="button"
+                className="text-xs text-indigo-900 hover:underline"
+              >
+                Forgot Password?
+              </button>
+            </div>
+
             <input
               type="password"
               name="password"
               value={userInput.password}
               onChange={handleUserInput}
               placeholder="Enter your password"
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-300 bg-gray-50/60 transition"
+              className="w-full px-4 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-900 focus:border-indigo-900 transition"
             />
           </div>
 
-          {/* Submit Button */}
+          {/* Login Button */}
           <button
             type="submit"
-            className="w-full bg-indigo-600 text-white py-2.5 rounded-xl font-semibold shadow-md hover:shadow-lg hover:bg-indigo-700 transition-all duration-200"
+            className="w-full py-2.5 rounded-lg font-semibold text-white bg-gradient-to-r from-indigo-900 to-indigo-700 hover:from-indigo-800 hover:to-indigo-600 transition shadow-md"
           >
-            Login
+            Sign In
           </button>
+
         </form>
 
-        <p className="text-center text-gray-600 text-sm mt-6">
-          Don’t have an account?{" "}
-          <Link
-            to="/register"
-            className="text-indigo-600 font-medium hover:text-indigo-700 hover:underline transition-colors"
-          >
-            Register
-          </Link>
-        </p>
       </div>
+
+      {/* Footer */}
+      <div className="border-t border-slate-200 px-8 py-4 text-center text-sm text-slate-600">
+        New to CampusCircle?{" "}
+        <Link
+          to="/register"
+          className="text-indigo-900 font-medium hover:underline"
+        >
+          Create an account
+        </Link>
+      </div>
+
     </div>
-  </HomeLayout>
+
+  </div>
 );
 
 

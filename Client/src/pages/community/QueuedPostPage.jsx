@@ -10,6 +10,7 @@ import {
 } from "../../../Redux/Slices/QueuedPostSlice";
 import HomeLayout from "../../layouts/HomeLayouts";
 import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function QueuedPostPage() {
   const dispatch = useDispatch();
@@ -125,33 +126,65 @@ function QueuedPostPage() {
     }
   };
 
+  const navigate = useNavigate();
+
   return (
   <HomeLayout>
-    <div className="max-w-4xl mx-auto px-4 py-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        {/* Left: Group icon + name */}
-        <div className="flex items-center gap-3">
+    <div className="max-w-5xl mx-auto px-6 py-10">
+
+      {/* ================= BACK BUTTON ================= */}
+      <div className="mb-8">
+        <button
+          onClick={() => navigate(-1)}
+          className="
+            inline-flex items-center gap-2
+            px-4 py-2
+            rounded-lg
+            border border-slate-300
+            bg-slate-100
+            text-slate-700
+            text-sm font-medium
+            hover:bg-slate-200
+            hover:border-slate-400
+            transition duration-200
+            shadow-sm
+          "
+        >
+          <span className="text-base leading-none">←</span>
+          Back
+        </button>
+      </div>
+
+      {/* ================= PAGE HEADER ================= */}
+      <div className="mb-10">
+
+        <div className="flex items-center gap-4">
+
           {groupIcon && (
             <img
               src={groupIcon}
               alt={groupName}
-              className="w-10 h-10 rounded-full object-cover"
+              className="w-12 h-12 rounded-full object-cover shadow-sm"
             />
           )}
-          <h1 className="text-xl font-semibold text-gray-900">
-            {groupName}
-          </h1>
+
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+              Queued Posts
+            </h1>
+
+            <p className="text-sm text-slate-500 mt-1">
+              Review and manage posts queued for approval.
+            </p>
+          </div>
+
         </div>
 
-        {/* Right: queued count */}
-        <div className="text-sm text-gray-600">
-          {queuedPostsCount} posts queued to be reviewed
-        </div>
+        <div className="mt-6 border-b border-slate-200" />
       </div>
 
-      {/* Queued posts list */}
-      <div className="flex flex-col gap-4">
+      {/* ================= QUEUED POSTS ================= */}
+      <div className="space-y-6">
         {queuedPosts?.length > 0 ? (
           queuedPosts.map((post) => (
             <QueuedPostCard
@@ -176,12 +209,12 @@ function QueuedPostPage() {
             />
           ))
         ) : !isLoading ? (
-          /* Empty state */
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="mb-4 flex items-center justify-center w-16 h-16 rounded-full bg-green-100">
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+
+            <div className="mb-5 flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="w-8 h-8 text-green-600"
+                className="w-8 h-8 text-emerald-600"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -195,29 +228,25 @@ function QueuedPostPage() {
               </svg>
             </div>
 
-            <h2 className="text-lg font-semibold text-gray-800">
+            <h2 className="text-xl font-semibold text-slate-900">
               All queued posts reviewed 🎉
             </h2>
 
-            <p className="mt-1 text-sm text-gray-500 max-w-sm">
-              You’re all caught up. New posts will appear here when they need
-              review.
+            <p className="mt-2 text-sm text-slate-500 max-w-md">
+              You’re all caught up. New posts will appear here when they need review.
             </p>
           </div>
         ) : null}
       </div>
 
-      {/* Infinite scroll loader */}
       {isLoading && (
-        <div className="text-center text-gray-500 py-6">
+        <div className="text-center text-slate-500 py-8">
           Loading more posts...
         </div>
       )}
 
-      {/* Intersection observer target */}
       <div ref={bottomRef} className="h-1" />
 
-      {/* Confirm modal */}
       <ConfirmModal
         isOpen={confirmState.isOpen}
         title={confirmState.title}

@@ -15,40 +15,76 @@ function CommentCard({ comment, onDelete }) {
     comment?.author?._id === user_id || post?.group?.admin === user_id || post?.author?._id === user_id;
 
   return (
-    <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
-      {/* Avatar */}
-      <img
-        src={avatarUrl}
-        alt="avatar"
-        className="w-10 h-10 rounded-full object-cover"
-      />
+  <div
+    className="
+      group
+      flex items-start gap-3
+      p-4
+      bg-white
+      rounded-xl
+      border border-slate-200
+      shadow-sm
+      hover:shadow-md
+      transition-all duration-200
+    "
+  >
+    {/* Avatar */}
+    <img
+      src={avatarUrl}
+      alt="avatar"
+      className="
+        w-9 h-9
+        rounded-full
+        object-cover
+        ring-2 ring-slate-100
+        flex-shrink-0
+      "
+    />
 
-      {/* Comment Content */}
-      <div className="flex-1">
-        <div className="flex items-center gap-2">
-          <p className="font-semibold text-sm text-gray-900">{authorName}</p>
-          <span className="text-xs text-gray-500">{timeAgo}</span>
-        </div>
+    {/* Comment Content */}
+    <div className="flex-1 min-w-0">
 
-        <p className="text-gray-700 text-sm mt-1 whitespace-pre-line">
-          {content}
+      <div className="flex items-center gap-2 flex-wrap">
+        <p className="font-semibold text-sm text-slate-900">
+          {authorName}
         </p>
+
+        <span className="text-xs text-slate-500">
+          {timeAgo}
+        </span>
       </div>
 
-      {/* Delete Button */}
-      {allowedToDelete && (
-        <button
-          onClick={() => {
-            onDelete(post?._id, comment?._id)
-          }
-        }
-          className="text-red-500 text-xs font-medium hover:underline"
-        >
-          Delete
-        </button>
-      )}
+      <p className="
+          text-slate-700
+          text-sm
+          mt-1.5
+          leading-relaxed
+          whitespace-pre-line
+        "
+      >
+        {content}
+      </p>
     </div>
-  );
+
+    {/* Delete Button */}
+    {allowedToDelete && (
+      <button
+        onClick={() => {
+          onDelete(post?._id, comment?._id)
+        }}
+        className="
+          opacity-0 group-hover:opacity-100
+          text-xs font-medium
+          text-red-600
+          hover:text-red-700
+          transition duration-200
+        "
+      >
+        Delete
+      </button>
+    )}
+  </div>
+);
 }
 
 export default CommentCard;

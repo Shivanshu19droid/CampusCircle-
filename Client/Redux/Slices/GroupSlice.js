@@ -84,8 +84,8 @@ export const getAllGroups = createAsyncThunk(
         params: { page, searchQuery },
       });
       const res = await toast.promise(resPromise, {
-        loading: "Fetching all groups...",
-        success: "Groups fetched successfully",
+        //loading: "Fetching all groups...",
+        //success: "Groups fetched successfully",
         error: "Failed to fetch groups",
       });
       return { ...res.data, page };
@@ -237,14 +237,14 @@ export const likeUnlikePost = createAsyncThunk(
   "/group/like-unlike-post",
   async (postId) => {
     try {
-      const resPromise = axiosInstance.put(`/post/like-unlike/${postId}`);
-      const res = await toast.promise(resPromise, {
-        loading: "Updating like status",
-        success: (res) => {
-          return res?.data?.message;
-        },
-        error: "Failed to update like status",
-      });
+      const res = await axiosInstance.put(`/post/like-unlike/${postId}`);
+      // const res = await toast.promise(resPromise, {
+      //   //loading: "Updating like status",
+      //   // success: (res) => {
+      //   //   return res?.data?.message;
+      //   // },
+      //   error: "Failed to update like status",
+      // });
       return res.data;
     } catch (error) {
       toast.error(error?.response?.data?.message);

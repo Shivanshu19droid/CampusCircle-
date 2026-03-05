@@ -29,42 +29,47 @@ function MemberCard({
 
  return (
   <div
-    className="w-full flex items-center justify-between px-4 py-3 rounded-md cursor-pointer hover:bg-white/80 hover:bg-opacity-100 transition-colors"
+    className="w-full flex items-center justify-between px-6 py-4 
+               bg-white border-b border-slate-200 
+               hover:bg-indigo-50/40 transition-all duration-200 cursor-pointer"
     onClick={() => onProfileClick(memberId)}
     role="button"
     tabIndex={0}
     onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onProfileClick(memberId); }}
   >
-    {/* Left: avatar + name + admin badge */}
+    {/* LEFT: Avatar + Name + Admin Badge */}
     <div className="flex items-center gap-4 min-w-0">
       <img
         src={memberAvatar || "/images/avatar-placeholder.png"}
         alt={memberName || "Member avatar"}
-        className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+        className="w-12 h-12 rounded-full object-cover flex-shrink-0 ring-2 ring-slate-100"
         onError={(e) => { e.currentTarget.src = "/images/avatar-placeholder.png"; }}
       />
 
-      <div className="flex items-center gap-2 min-w-0">
-        <span className="text-sm md:text-base font-medium truncate max-w-xs sm:max-w-sm md:max-w-md">
+      <div className="flex items-center gap-3 min-w-0">
+        <span className="text-base font-medium text-slate-900 truncate max-w-xs sm:max-w-sm md:max-w-md">
           {memberName || "Unknown Member"}
         </span>
 
-        {/* Admin badge */}
+        {/* ✅ Green Admin Badge */}
         {isMemberAdmin && (
-          <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-800">
-            Admin
+          <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full 
+                           bg-emerald-100 text-emerald-700 border border-emerald-200">
+            ADMIN
           </span>
         )}
       </div>
     </div>
 
-    {/* Right: action buttons (only visible when logged-in user is an admin) */}
-    <div className="flex items-center gap-2 flex-shrink-0">
+    {/* RIGHT: Action Buttons */}
+    <div className="flex items-center gap-3 flex-shrink-0">
       {isUserAdmin ? (
         isMemberAdmin ? (
           <button
             type="button"
-            className="text-sm px-2 py-1 rounded-md bg-red-600 hover:bg-red-700 text-white font-medium"
+            className="text-sm px-4 py-2 rounded-lg 
+                       border border-red-200 text-red-600 
+                       hover:bg-red-50 transition duration-200 font-medium"
             onClick={(e) => { e.stopPropagation(); onRemoveFromAdmin({memberId}); }}
             aria-label={`Remove ${memberName} from admin`}
           >
@@ -74,16 +79,22 @@ function MemberCard({
           <>
             <button
               type="button"
-              className="text-sm px-2 py-1 rounded-md bg-green-600 hover:bg-green-700 text-white font-medium"
+              className="text-sm px-4 py-2 rounded-lg 
+                         bg-gradient-to-b from-indigo-800 to-indigo-700 
+                         text-white font-medium 
+                         hover:from-indigo-900 hover:to-indigo-800 
+                         transition duration-200 shadow-sm"
               onClick={(e) => { e.stopPropagation(); onMakeAdmin({memberId}); }}
               aria-label={`Make ${memberName} admin`}
             >
-              Make admin
+              Make Admin
             </button>
 
             <button
               type="button"
-              className="text-sm px-2 py-1 rounded-md bg-gray-700 hover:bg-gray-600 text-white font-medium"
+              className="text-sm px-4 py-2 rounded-lg 
+                         border border-slate-300 text-slate-600 
+                         hover:bg-slate-100 transition duration-200 font-medium"
               onClick={(e) => { e.stopPropagation(); onRemove({memberId}); }}
               aria-label={`Remove ${memberName} from group`}
             >

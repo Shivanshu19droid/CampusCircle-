@@ -1,8 +1,9 @@
 import PostCard from "./PostCard";
 import { useEffect, useRef } from "react";
 import {useNavigate} from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchSinglePost } from "../../../Redux/Slices/postSlice";
+
 
 function FeedContainer({ posts, onLike, onLoadMore, hasMore, loadingMore }) {
   const navigate = useNavigate();
@@ -16,6 +17,8 @@ function FeedContainer({ posts, onLike, onLoadMore, hasMore, loadingMore }) {
   const navigateToComments = (postId) => {
     navigate(`/community/posts/${postId}`);
   };
+
+  const userId = useSelector((state) => state?.auth?.data?.id);
 
   //infinite scroll detector
   useEffect(() => {
@@ -50,6 +53,7 @@ function FeedContainer({ posts, onLike, onLoadMore, hasMore, loadingMore }) {
           onLike={onLike}
           navigateToPost={navigateToPost}
           navigateToComments={navigateToComments}
+          user_id={userId}
         />
       </div>
     ))}

@@ -34,7 +34,7 @@ const HomeLayout = ({ children }) => {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
   return (
-    <div className="flex min-h-screen bg-gray-50 text-gray-800">
+    <div className="flex min-h-screen bg-gray-100 text-gray-800">
       {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} />
 

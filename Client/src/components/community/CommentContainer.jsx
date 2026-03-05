@@ -82,12 +82,48 @@ function CommentContainer() {
     return () => observer.disconnect();
   }, [commentsPage, hasMoreComments, loadingMoreComments, postId]);
 
-  return (
-  <div className="mt-6 flex flex-col h-full">
+return (
+  <div
+    className="
+      mt-6
+      bg-white
+      rounded-2xl
+      border border-slate-200
+      shadow-[0_20px_25px_-5px_rgb(0_0_0_/0.1)]
+      overflow-hidden
+    "
+  >
 
-    {/* COMMENTS LIST (scrollable) */}
-    <div className="flex-1 space-y-4 overflow-y-auto pr-2">
+    {/* ===== MOBILE HEADER (Simple) ===== */}
+    <div className="px-6 py-4 border-b border-slate-200 lg:hidden">
+      <div className="flex items-center justify-between">
+        <h3 className="text-base font-semibold text-slate-900">
+          Comments
+        </h3>
 
+        <span className="text-xs text-slate-500">
+          {comments?.length || 0}
+        </span>
+      </div>
+    </div>
+
+    {/* ===== DESKTOP HEADER (Indigo Strip) ===== */}
+    <div className="hidden lg:flex bg-gradient-to-r from-indigo-900 to-indigo-800 px-6 py-4 items-center justify-between">
+      <h3 className="text-sm font-semibold text-white tracking-wide">
+        Comments
+      </h3>
+
+      <span className="text-xs text-indigo-200">
+        {comments?.length || 0}
+      </span>
+    </div>
+
+
+    {/* ===== SCROLLABLE COMMENTS AREA ===== */}
+    <div
+      className="px-6 py-5 space-y-4 overflow-y-auto"
+      style={{ maxHeight: "420px" }}
+    >
       {comments?.length > 0 ? (
         comments.map((comment) => (
           <CommentCard
@@ -100,50 +136,70 @@ function CommentContainer() {
           />
         ))
       ) : (
-        <p className="text-center text-gray-500 py-4">No comments yet.</p>
+        <div className="text-center text-slate-400 py-8 text-sm">
+          No comments yet.
+        </div>
       )}
 
-      {/* Pagination trigger */}
       <div ref={bottomRef} className="h-6"></div>
 
       {loadingMoreComments && (
-        <p className="text-center text-gray-500 pb-3">
+        <p className="text-center text-slate-400 text-sm">
           Loading more comments...
         </p>
       )}
     </div>
 
-    {/* ADD COMMENT BOX */}
-    <form
-      onSubmit={handlePostComment}
-      className="flex items-center gap-3 mt-4 border-t pt-4"
-    >
-      <input
-        type="text"
-        placeholder="Write a comment..."
-        value={commentContent}
-        onChange={handleCommentInputChange}
-        className="flex-1 border rounded-lg p-2 focus:outline-none"
-      />
 
-      <button
-        type="submit"
-        className="bg-blue-600 text-white p-2 rounded-lg flex items-center justify-center hover:bg-blue-700 transition"
+    {/* ===== INPUT SECTION ===== */}
+    <div className="border-t border-slate-200 px-6 py-4 bg-slate-50">
+      <form
+        onSubmit={handlePostComment}
+        className="flex items-center gap-3"
       >
-        <SendHorizontal size={20} />
-      </button>
-    </form>
+        <input
+          type="text"
+          placeholder="Add a comment..."
+          value={commentContent}
+          onChange={handleCommentInputChange}
+          className="
+            flex-1
+            bg-white
+            border border-slate-300
+            rounded-lg
+            px-4 py-2
+            text-sm
+            focus:outline-none
+            focus:ring-2 focus:ring-indigo-800
+          "
+        />
+
+        <button
+          type="submit"
+          className="
+            px-4 py-2
+            rounded-lg
+            bg-indigo-800
+            text-white
+            text-sm
+            hover:bg-indigo-900
+          "
+        >
+          <SendHorizontal size={18} />
+        </button>
+      </form>
+    </div>
+
 
     <ConfirmModal
-       isOpen = {openConfirm}
-       message = "Are you sure you want to delete this comment ? This action cannot be undone!"
-       onConfirm = {() => onDelete(postId, commentToDelete)}
-       onCancel = {() => setOpenConfirm(false)}
-      />
+      isOpen={openConfirm}
+      message="Are you sure you want to delete this comment ? This action cannot be undone!"
+      onConfirm={() => onDelete(postId, commentToDelete)}
+      onCancel={() => setOpenConfirm(false)}
+    />
 
   </div>
 );
-
 
 }
 

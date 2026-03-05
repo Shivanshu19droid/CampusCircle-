@@ -25,82 +25,146 @@ function PostCardFull({post, onLike, onDelete, isLiked, onCommentsClick}) {
     
 
 return (
-  <div className="bg-white rounded-xl shadow-md p-4 mb-6">
+  <div
+    className="
+      bg-white
+      rounded-2xl
+      overflow-hidden
+      border border-slate-200
+      shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1)]
+    "
+  >
 
-    {/* AUTHOR */}
-    <div className="flex items-center gap-3 mb-4">
-      <img 
-        src={avatarUrl}
-        alt="avatar"
-        className="w-12 h-12 rounded-full object-cover"
-      />
-      <div>
-        <p className="font-semibold text-gray-900">{authorName}</p>
-        <p className="text-xs text-gray-500">{timeAgo}</p>
+    {/* ===== HEADER ===== */}
+    <div className="px-6 py-4 flex items-center justify-between">
 
-        {/* Group */}
-        {groupName && (
-          <div className="flex items-center gap-2 mt-1">
-            <img 
-              src={groupIcon}
-              alt="group"
-              className="w-5 h-5 rounded-full"
-            />
-            <p className="text-xs text-gray-600">{groupName}</p>
-          </div>
-        )}
+      <div className="flex items-center gap-3">
+
+        <img
+          src={avatarUrl}
+          alt="avatar"
+          className="w-11 h-11 rounded-full object-cover ring-2 ring-slate-100"
+        />
+
+        <div className="leading-tight">
+          <p className="font-semibold text-slate-900 text-sm">
+            {authorName}
+          </p>
+
+          <p className="text-xs text-slate-500">
+            {timeAgo}
+          </p>
+
+          {groupName && (
+            <div className="flex items-center gap-2 mt-1">
+              <img
+                src={groupIcon}
+                alt="group"
+                className="w-4 h-4 rounded-full"
+              />
+              <p className="text-xs text-slate-600">
+                {groupName}
+              </p>
+            </div>
+          )}
+        </div>
       </div>
+
     </div>
 
-    {/* CONTENT */}
-    <p className="text-gray-800 text-sm mb-4 whitespace-pre-line">
-      {content}
-    </p>
-
-    {/* IMAGE */}
+    {/* ===== MEDIA ===== */}
     {postImage && (
-      <img 
-        src={postImage}
-        alt="post"
-        className="w-full rounded-lg max-h-[550px] object-cover mb-4"
-      />
+      <div className="w-full bg-black">
+        <img
+          src={postImage}
+          alt="post"
+          className="w-full max-h-[600px] object-cover"
+        />
+      </div>
     )}
 
-    {/* ACTIONS */}
-    <div className="flex items-center justify-between mt-4">
+    {/* ===== CONTENT ===== */}
+    {content && (
+      <div className="px-6 py-4">
+        <p className="text-slate-800 text-sm leading-relaxed whitespace-pre-line">
+          {content}
+        </p>
+      </div>
+    )}
 
-      {/* LIKE BUTTON & COUNT */}
-      <button 
-        onClick={() => onLike(post?._id)}
-        className="flex items-center gap-2 text-gray-700 hover:text-red-500 transition"
-      >
-        <Heart 
-          size={20} 
-          fill={isLiked ? "red" : "none"} 
-          stroke={isLiked ? "red" : "currentColor"}
-        />
-        <span className="font-medium">
-          {post.likes?.length || 0}
-        </span>
-      </button>
+    {/* ===== DIVIDER ===== */}
+    <div className="border-t border-slate-200" />
 
-      {/* COMMENT BUTTON & COUNT */}
-      <button 
-        onClick={onCommentsClick}
-        className="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition"
-      >
-        <MessageCircle size={20} />
-        <span className="font-medium">
-          {post.comments?.length|| 0}
-        </span>
-      </button>
+    {/* ===== ACTION BAR ===== */}
+    <div className="px-6 py-4 flex items-center justify-between">
+
+      <div className="flex items-center gap-6">
+
+        {/* LIKE BUTTON */}
+        <button
+          onClick={() => onLike(post?._id)}
+          className="
+            flex items-center gap-2
+            text-slate-700
+            hover:text-indigo-700
+            transition duration-200
+          "
+        >
+          <Heart
+            size={20}
+            fill={isLiked ? "#4338CA" : "none"}
+            stroke={isLiked ? "#4338CA" : "currentColor"}
+          />
+          <span className="text-sm font-medium">
+            {post.likes?.length || 0}
+          </span>
+        </button>
+
+        {/* COMMENT BUTTON */}
+        <button
+          onClick={onCommentsClick}
+          className="
+            flex items-center gap-2
+            text-slate-700
+            hover:text-indigo-700
+            transition duration-200
+          "
+        >
+          <MessageCircle size={20} />
+          <span className="text-sm font-medium">
+            {post.comments?.length || 0}
+          </span>
+        </button>
+
+      </div>
 
       {/* DELETE BUTTON */}
       {allowedToDelete && (
         <button
           onClick={() => onDelete(post?._id)}
-          className="text-red-500 font-medium hover:underline"
+          className="
+            inline-flex items-center gap-2
+            px-3 py-1.5
+            rounded-lg
+            border border-red-200
+            bg-red-50
+            text-red-600
+            text-xs font-medium
+            hover:bg-red-100
+            hover:border-red-300
+            transition duration-200
+          "
         >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            className="w-4 h-4"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14" />
+          </svg>
           Delete
         </button>
       )}

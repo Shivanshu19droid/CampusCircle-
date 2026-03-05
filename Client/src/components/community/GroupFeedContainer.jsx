@@ -33,93 +33,69 @@ function GroupFeedContainer({
   }, [hasMore]);
 
   return (
-  <div className="space-y-6">
-    {/* Header */}
-    <div className="flex items-center justify-between px-4 py-3 bg-white/5 rounded-lg shadow-sm">
+  <div className="space-y-8">
+
+    {/* Section Header */}
+    {/* <div className="flex items-center justify-between">
       <div className="flex items-center gap-3">
-        <h2 className="text-lg font-semibold">Group Posts</h2>
-        <span className="text-sm text-gray-400">
-          {posts?.length ?? 0} post{(posts?.length ?? 0) > 1 ? "s" : ""}
+        <h2 className="text-xl font-semibold text-slate-900">
+          Group Posts
+        </h2>
+
+        <span className="text-sm text-slate-500">
+          {posts?.length ?? 0} post
+          {(posts?.length ?? 0) > 1 ? "s" : ""}
         </span>
       </div>
-      {/* removed the "Share something useful" / post button as requested */}
-    </div>
+    </div> */}
 
-    {/* Posts list */}
-    <div className="space-y-4">
+    {/* Posts List */}
+    <div className="space-y-6">
+
       {posts && posts.length > 0 ? (
         posts.map((post) => (
           <article
             key={post._id}
-            className="bg-white/3 p-4 rounded-xl hover:shadow-lg transition-shadow duration-150 cursor-pointer"
+            onClick={() => onPostClick && onPostClick(post._id)}
+            className="bg-white border border-slate-200 rounded-2xl p-5 
+                       shadow-[0_1px_3px_0_rgb(0_0_0_/0.08)] 
+                       hover:shadow-[0_20px_25px_-5px_rgb(0_0_0_/0.1)] 
+                       hover:-translate-y-[2px] 
+                       transition-all duration-200 ease-in-out cursor-pointer"
           >
-            {/* PostCard (presentational) */}
             <PostCard
               post={post}
               onLike={() => onLike && onLike(post._id)}
               navigateToPost={(id) => onPostClick && onPostClick(id)}
               navigateToComments={(id) => onPostClick && onPostClick(id)}
             />
-
-            {/* Actions row */}
-            <div className="mt-3 flex items-center justify-between text-sm text-gray-300">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onLike && onLike(post._id);
-                  }}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-900/60 hover:bg-gray-900/75 transition"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 15l7-7 7 7"
-                    />
-                  </svg>
-                  <span>
-                    {post?.likes?.length ?? 0} Like
-                    {(post?.likes?.length ?? 0) > 1 ? "s" : ""}
-                  </span>
-                </button>
-              </div>
-
-              <div className="text-xs text-gray-500">
-                {new Date(post?.createdAt).toLocaleString?.() ?? ""}
-              </div>
-            </div>
           </article>
         ))
       ) : (
-        <div className="p-8 text-center text-gray-400">
-          <p className="mb-2 font-medium">No posts yet</p>
-          <p className="text-sm">
+        <div className="bg-white border border-slate-200 rounded-2xl p-10 text-center shadow-sm">
+          <p className="text-base font-medium text-slate-700 mb-2">
+            No posts yet
+          </p>
+          <p className="text-sm text-slate-500">
             Be the first to share something useful with the group.
           </p>
         </div>
       )}
+
     </div>
 
     {/* Infinite-scroll sentinel */}
     <div ref={bottomRef} className="w-full h-6" />
 
-    {/* Loading / end states */}
+    {/* Loading / End States */}
     {loadingMore && (
-      <p className="text-center py-4 text-gray-400">
+      <p className="text-center py-6 text-sm text-slate-500">
         Loading more posts…
       </p>
     )}
 
     {!hasMore && posts?.length > 0 && (
-      <p className="text-center py-4 text-gray-400">
+      <p className="text-center py-6 text-sm text-slate-400">
         No more posts to show.
       </p>
     )}

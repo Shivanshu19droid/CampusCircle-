@@ -83,8 +83,8 @@ function CreatePostPage() {
         }
     }, [isAccessAllowed, navigate]);
 
-   return (
-  <div className="min-h-screen backdrop-blur-sm flex justify-center px-3 sm:px-4 pt-6 sm:pt-12">
+  return (
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-900 to-[#2E2A8C] px-4 py-12">
     <form
       onSubmit={handleSubmit}
       className="
@@ -92,34 +92,38 @@ function CreatePostPage() {
         max-w-6xl
         bg-white
         rounded-2xl
-        shadow-lg
+        border border-slate-200
+        shadow-[0_25px_40px_-10px_rgba(0,0,0,0.4)]
         overflow-hidden
         flex
         flex-col
         md:flex-row
-        md:min-h-[75vh]
+        transition-all duration-200
       "
     >
-      {/* ---------- IMAGE UPLOAD ---------- */}
+      {/* ---------- IMAGE PANEL ---------- */}
       <div
         className="
           w-full
           md:w-1/2
-          h-56
-          sm:h-72
-          md:h-auto
-          bg-gray-50
+          bg-slate-50
+          border-b
+          md:border-b-0
+          md:border-r
+          border-slate-200
           flex
           items-center
           justify-center
           relative
+          min-h-[260px]
+          md:min-h-[520px]
         "
       >
         {!previewImage ? (
-          <label className="cursor-pointer flex flex-col items-center text-gray-400">
+          <label className="cursor-pointer flex flex-col items-center text-slate-400 hover:text-indigo-900 transition duration-200">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-10 w-10 sm:h-12 sm:w-12"
+              className="h-12 w-12"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -131,7 +135,11 @@ function CreatePostPage() {
                 d="M3 16l4-4a3 3 0 014 0l4 4m0 0l4-4a3 3 0 014 0m-8-8h.01M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
-            <span className="mt-2 text-sm">Upload image</span>
+
+            <span className="mt-3 text-sm font-medium">
+              Upload Image
+            </span>
+
             <input
               type="file"
               accept="image/*"
@@ -143,51 +151,50 @@ function CreatePostPage() {
           <img
             src={previewImage}
             alt="Post preview"
-            className="
-              w-full
-              h-full
-              object-contain
-              md:object-contain
-            "
+            className="w-full h-full object-contain"
           />
         )}
       </div>
 
-      {/* ---------- CONTENT ---------- */}
+      {/* ---------- CONTENT PANEL ---------- */}
       <div
         className="
           w-full
           md:w-1/2
-          p-4
-          sm:p-6
-          md:p-8
+          px-6
+          sm:px-8
+          py-6
+          sm:py-8
           flex
           flex-col
         "
       >
-        {/* Posting context */}
-        <div className="flex items-center gap-2 mb-3 sm:mb-4">
+        {/* Posting Context */}
+        <div className="flex items-center gap-3 mb-6">
           {isGroupPost ? (
             <>
               {groupIcon && (
                 <img
                   src={groupIcon}
                   alt={groupName}
-                  className="w-6 h-6 sm:w-7 sm:h-7 rounded-md object-cover"
+                  className="w-8 h-8 rounded-lg object-cover border border-slate-200"
                 />
               )}
-              <span className="text-sm text-gray-600">
-                Posting to <span className="font-medium">{groupName}</span>
+              <span className="text-sm text-slate-600">
+                Posting to{" "}
+                <span className="font-semibold text-slate-900">
+                  {groupName}
+                </span>
               </span>
             </>
           ) : (
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-slate-500">
               Posting individually
             </span>
           )}
         </div>
 
-        {/* Content input */}
+        {/* Content Input */}
         <textarea
           value={content}
           onChange={onContentChange}
@@ -195,34 +202,40 @@ function CreatePostPage() {
           className="
             flex-1
             resize-none
-            border
             rounded-lg
-            p-3
-            sm:p-4
+            border border-slate-200
+            bg-white
+            px-4
+            py-3
             text-sm
-            sm:text-base
+            text-slate-800
+            placeholder-slate-400
             focus:outline-none
             focus:ring-2
-            focus:ring-blue-500
+            focus:ring-indigo-900
+            focus:border-indigo-900
+            transition duration-200
           "
         />
 
-        {/* Submit button */}
-        <div className="flex justify-end mt-4 sm:mt-6">
+        {/* Footer */}
+        <div className="flex justify-end mt-6">
           <button
             type="submit"
             disabled={!content.trim() && !image}
             className="
-              px-6
-              sm:px-8
-              py-2
-              sm:py-2.5
-              bg-blue-600
-              text-white
+              px-8
+              py-2.5
+              text-sm
+              font-medium
               rounded-lg
-              hover:bg-blue-700
-              transition
+              bg-indigo-900
+              text-white
+              hover:bg-indigo-800
+              transition duration-200
               disabled:opacity-50
+              disabled:cursor-not-allowed
+              shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)]
             "
           >
             Post

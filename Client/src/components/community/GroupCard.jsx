@@ -23,73 +23,109 @@ function GroupCard({group, isMember, onJoin, onLeave, navigateToGroup}) {
     return (
   <div
     onClick={() => navigateToGroup(_id)}
-    className="w-full bg-white rounded-[24px] p-4 sm:p-5 cursor-pointer shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:scale-[1.01] transition-transform duration-200 flex flex-col"
+    className="
+      w-full
+      bg-white
+      rounded-2xl
+      border border-slate-200
+      shadow-sm
+      hover:shadow-md
+      transition-all duration-200
+      cursor-pointer
+      overflow-hidden
+      flex flex-col
+    "
   >
-    <div className="flex items-start gap-3 sm:gap-4">
-      
-      {/* Group Icon */}
+    {/* ===== IMAGE SECTION ===== */}
+    <div className="w-full h-40 sm:h-44 md:h-48 overflow-hidden">
       <img
         src={groupIcon}
         alt={name}
-        className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover flex-shrink-0"
+        className="
+          w-full h-full
+          object-cover
+          transition-transform duration-300
+          hover:scale-105
+        "
       />
-
-      {/* Group Info */}
-      <div className="flex-1 min-w-0">
-        
-        {/* Name */}
-        <h2 className="font-semibold text-base sm:text-lg text-gray-800 truncate">
-          {name}
-        </h2>
-
-        {/* Category */}
-        {category && (
-          <span className="text-xs sm:text-sm text-[#064E3B] capitalize block mt-1 font-medium">
-            {category}
-          </span>
-        )}
-
-        {/* Description */}
-        {trimmedDescription && (
-          <p className="text-sm text-gray-600 mt-2 line-clamp-3 leading-relaxed">
-            {trimmedDescription}
-          </p>
-        )}
-
-        {/* Members count */}
-        <p className="text-xs text-gray-500 mt-3">
-          {members.length} member{members.length !== 1 ? "s" : ""}
-        </p>
-      </div>
     </div>
 
-    {/* JOIN / LEAVE BUTTON */}
-    <div className="mt-4 flex sm:justify-end">
-      {isMember ? (
-        <button
-          className="w-full sm:w-auto px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-colors"
-          onClick={(e) => {
-            e.stopPropagation();
-            onLeave(_id);
-          }}
-          aria-label="Leave group"
-          type="button"
-        >
-          Leave
-        </button>
-      ) : (
-        <button
-          className="w-full sm:w-auto px-4 py-2 rounded-full bg-[#FF6B35] text-white text-sm font-medium hover:opacity-90 transition-all"
-          onClick={(e) => {
-            e.stopPropagation();
-            onJoin(_id);
-          }}
-          aria-label="Join group"
-          type="button"
-        >
-          Join
-        </button>
+    {/* ===== CONTENT SECTION ===== */}
+    <div className="p-4 sm:p-5 flex flex-col flex-1">
+
+      {/* Name */}
+      <h2 className="font-semibold text-base sm:text-lg text-slate-900 truncate">
+        {name}
+      </h2>
+
+      {/* Category */}
+      {category && (
+        <span className="text-xs sm:text-sm text-indigo-700 capitalize mt-1 font-medium">
+          {category}
+        </span>
       )}
+
+      {/* Description */}
+      {trimmedDescription && (
+        <p className="text-sm text-slate-600 mt-3 line-clamp-3 leading-relaxed flex-1">
+          {trimmedDescription}
+        </p>
+      )}
+
+      {/* Members + Button Row */}
+      <div className="mt-5 flex items-center justify-between">
+
+        <p className="text-xs text-slate-500">
+          {members.length} member{members.length !== 1 ? "s" : ""}
+        </p>
+
+        {isMember ? (
+          <button
+            className="
+              px-5 py-2.5
+              rounded-lg
+              bg-rose-600
+              text-white
+              text-sm font-semibold
+              shadow-sm
+              hover:bg-rose-700
+              hover:shadow-md
+              active:scale-95
+              transition-all duration-200
+            "
+            onClick={(e) => {
+              e.stopPropagation();
+              onLeave(_id);
+            }}
+            type="button"
+          >
+            Leave
+          </button>
+        ) : (
+          <button
+            className="
+              px-5 py-2.5
+              rounded-lg
+              bg-indigo-900
+              text-white
+              text-sm font-semibold
+              shadow-sm
+              hover:bg-indigo-800
+              hover:shadow-md
+              active:scale-95
+              transition-all duration-200
+            "
+            onClick={(e) => {
+              e.stopPropagation();
+              onJoin(_id);
+            }}
+            type="button"
+          >
+            Join
+          </button>
+        )}
+
+      </div>
     </div>
   </div>
 );

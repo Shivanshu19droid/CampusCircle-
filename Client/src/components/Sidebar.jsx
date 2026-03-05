@@ -13,36 +13,40 @@ const Sidebar = ({ isOpen }) => {
   ];
 
   return (
-    <aside
-      className={`bg-white h-screen fixed top-0 left-0 z-40 transform ${
-        isOpen ? "translate-x-0" : "-translate-x-full"
-      } transition-transform duration-300 w-64 border-r border-gray-100 shadow-sm`}
-    >
-      <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white">
-        <h2 className="text-xl font-semibold tracking-tight">CampusCircle</h2>
-      </div>
+  <aside
+    className={`bg-white h-screen fixed top-0 left-0 z-40 transform ${
+      isOpen ? "translate-x-0" : "-translate-x-full"
+    } transition-transform duration-300 w-64 border-r border-slate-200 shadow-[0_10px_30px_rgba(0,0,0,0.06)]`}
+  >
+    {/* Header */}
+    <div className="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-indigo-900 to-[#2E2A8C] text-white">
+      <h2 className="text-lg font-semibold tracking-tight">
+        CampusCircle 2.0
+      </h2>
+    </div>
 
-      <nav className="p-4 flex flex-col gap-1.5">
-        {navItems.map(({ name, icon: Icon, path }) => (
-          <NavLink
-            key={name}
-            to={path}
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all text-sm font-medium
-               ${
-                 isActive
-                   ? "bg-indigo-50 text-indigo-600 shadow-inner"
-                   : "text-gray-700 hover:bg-indigo-50 hover:text-indigo-600"
-               }`
-            }
-          >
-            <Icon size={20} />
-            <span>{name}</span>
-          </NavLink>
-        ))}
-      </nav>
-    </aside>
-  );
+    {/* Navigation */}
+    <nav className="p-5 flex flex-col gap-2">
+      {navItems.map(({ name, icon: Icon, path }) => (
+        <NavLink
+          key={name}
+          to={path}
+          className={({ isActive }) =>
+            `flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-sm font-medium
+             ${
+               isActive
+                 ? "bg-gradient-to-r from-indigo-900 to-[#2E2A8C] text-white shadow-md"
+                 : "text-slate-700 hover:bg-slate-100 hover:text-indigo-900"
+             }`
+          }
+        >
+          <Icon size={20} />
+          <span>{name}</span>
+        </NavLink>
+      ))}
+    </nav>
+  </aside>
+);
 };
 
 export default Sidebar;

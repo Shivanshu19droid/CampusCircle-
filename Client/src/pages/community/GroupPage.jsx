@@ -27,7 +27,6 @@ import HomeLayout from "../../layouts/HomeLayouts";
 //import VantaGlobeBackground from "../../components/VantaLayer";
 
 function GroupPage() {
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -40,7 +39,7 @@ function GroupPage() {
   const isAdmin = group?.admins?.some((admin) => admin?._id === user?._id);
   const isMember = group?.members?.some((member) => member === user?._id);
   //const isOnlyAdmin = group?.admins?.length === 1 && isAdmin;
-  const currAdmins = useSelector(state => state?.group?.admins);
+  const currAdmins = useSelector((state) => state?.group?.admins);
   const isOnlyAdmin = currAdmins.length === 1 && isAdmin;
 
   //toggle for members and posts
@@ -65,7 +64,7 @@ function GroupPage() {
     if (effectRan.current === false) {
       dispatch(getSingleGroup(groupId));
       dispatch(
-        fetchPaginatedGroupMembers({ groupId, page: 1, flag: "members" })
+        fetchPaginatedGroupMembers({ groupId, page: 1, flag: "members" }),
       );
       dispatch(fetchPaginatedGroupPosts({ groupId, page: 1 }));
       effectRan.current = true;
@@ -122,26 +121,26 @@ function GroupPage() {
   };
 
   const navigateToReviewPost = () => {
-    if(!user) {
+    if (!user) {
       navigate("/login");
       return;
     }
 
-    if(!isAdmin) {
+    if (!isAdmin) {
       toast.error("You are not allowed to access this route");
       return;
     }
 
     navigate(`/community/${groupId}/queued-posts`);
-  }
+  };
 
   const navigateToCreatePost = () => {
-    if(!user) {
+    if (!user) {
       navigate("/login");
       return;
     }
 
-    if(!isMember) {
+    if (!isMember) {
       toast.error("You are not allowed to access this route");
       return;
     }
@@ -150,20 +149,18 @@ function GroupPage() {
       state: {
         groupId: groupId,
         groupName: group?.name,
-        groupIcon: group?.icon
-      }
+        groupIcon: group?.icon,
+      },
     });
-
-    };
+  };
 
   const navigateToEditPage = () => {
-
-    if(!user) {
+    if (!user) {
       navigate("/login");
       return;
     }
-    
-    if(!isAdmin) {
+
+    if (!isAdmin) {
       toast.error("You are not allowed to access this route");
       return;
     }
@@ -174,29 +171,29 @@ function GroupPage() {
         groupName: group?.name,
         groupIcon: group?.icon,
         groupDescription: group?.description,
-        groupCategory: group?.category
-      }
-    })
+        groupCategory: group?.category,
+      },
+    });
   };
-  
+
   //we will create a helper function to make the logged in user appear on top
   const moveCurrentUserToTop = (list, userId) => {
-  if (!userId || !Array.isArray(list)) return list;
+    if (!userId || !Array.isArray(list)) return list;
 
-  const index = list.findIndex(item => item?._id === userId);
-  if (index === -1) return list;
+    const index = list.findIndex((item) => item?._id === userId);
+    if (index === -1) return list;
 
-  const userItem = list[index];
-  const remaining = list.filter(item => item?._id !== userId);
+    const userItem = list[index];
+    const remaining = list.filter((item) => item?._id !== userId);
 
-  return [userItem, ...remaining];
+    return [userItem, ...remaining];
 
-  // prop definitions for member container component
-};
+    // prop definitions for member container component
+  };
 
   const fetchedMembers = useSelector((state) => state?.group?.members);
   const members = moveCurrentUserToTop(fetchedMembers, user?._id);
-  
+
   const onRemoveMember = ({ groupId, memberId }) => {
     if (!user || !isAdmin) return;
 
@@ -206,7 +203,7 @@ function GroupPage() {
   const hasMoreMembers = useSelector((state) => state?.group?.hasMoreMembers);
 
   const loadingMoreMembers = useSelector(
-    (state) => state?.group?.loadingMoreMembers
+    (state) => state?.group?.loadingMoreMembers,
   );
 
   const onMakeAdmin = ({ groupId, memberId }) => {
@@ -239,7 +236,7 @@ function GroupPage() {
           groupId,
           page: currentMemberPage + 1,
           flag: "members",
-        })
+        }),
       );
     }
   };
@@ -249,7 +246,7 @@ function GroupPage() {
   const currentPostPage = useSelector((state) => state?.group?.postPage);
   const hasMorePosts = useSelector((state) => state?.group?.hasMorePosts);
   const loadingMorePosts = useSelector(
-    (state) => state?.group?.loadingMorePosts
+    (state) => state?.group?.loadingMorePosts,
   );
 
   const onLikePost = (postId) => {
@@ -266,7 +263,7 @@ function GroupPage() {
 
     if (hasMorePosts && !loadingMorePosts) {
       dispatch(
-        fetchPaginatedGroupPosts({ groupId, page: currentPostPage + 1 })
+        fetchPaginatedGroupPosts({ groupId, page: currentPostPage + 1 }),
       );
     }
   };
@@ -293,7 +290,7 @@ function GroupPage() {
 
   const hasMoreAdmins = useSelector((state) => state?.group?.hasMoreAdmins);
   const loadingMoreAdmins = useSelector(
-    (state) => state?.group?.loadingMoreAdmins
+    (state) => state?.group?.loadingMoreAdmins,
   );
   const currentAdminPage = useSelector((state) => state?.group?.adminsPage);
 
@@ -320,7 +317,7 @@ function GroupPage() {
           groupId,
           page: currentAdminPage + 1,
           flag: "admins",
-        })
+        }),
       );
     }
   };
@@ -394,7 +391,7 @@ function GroupPage() {
       case "delete-post":
         return () => {
           onDeletePost(payload.postId);
-        }
+        };
 
       default:
         return () => {};
@@ -411,183 +408,322 @@ function GroupPage() {
   // }, [posts, members]);
 
   return (
-  <HomeLayout>
-    {/* IMPORTANT:
-        This wrapper must stay transparent so Vanta shows through */}
-    <div className="relative z-10 min-h-screen bg-transparent">
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        
-        {/* Header */}
-        <div className="bg-white/80 backdrop-blur rounded-2xl p-4 shadow-md">
-          <GroupPageHeader
-            group={group}
-            isMember={isMember}
+    <HomeLayout>
+      <div className="relative z-10 min-h-screen bg-transparent">
+        {/* Soft ambient indigo glow */}
+        <div
+          className="absolute inset-0 pointer-events-none
+        bg-[radial-gradient(circle_at_top_center,rgba(79,70,229,0.08),transparent_55%)]"
+        />
+
+        <div className="relative max-w-7xl mx-auto px-4 py-12">
+          {/* BACK BUTTON */}
+          <div className="mb-6">
+            <button
+              onClick={() => navigate(-1)}
+              className="inline-flex items-center gap-2 px-4 py-2 
+               bg-slate-100 text-slate-700 
+               rounded-lg border border-slate-200
+               text-sm font-medium
+               hover:bg-slate-200 hover:text-slate-900
+               transition"
+            >
+              ← Back
+            </button>
+          </div>
+
+          {/* MOBILE LAYOUT */}
+          <div className="lg:hidden space-y-10">
+            <GroupPageHeader
+              group={group}
+              isMember={isMember}
+              isAdmin={isAdmin}
+              isOnlyAdmin={isOnlyAdmin}
+              onJoin={() => onJoin()}
+              onAdminClick={() => onAdminClick()}
+              onNewPost={navigateToCreatePost}
+              onReviewPost={navigateToReviewPost}
+              onLeave={() => {
+                openConfirm({
+                  type: "leave-group",
+                  title: "Leave Group",
+                  message: "Are you sure you want to leave this group?",
+                  payload: { groupId },
+                });
+              }}
+              onDelete={() => {
+                openConfirm({
+                  type: "delete-group",
+                  title: "Delete Group",
+                  message:
+                    "Are you sure you want to delete this group? This action cannot be undone!",
+                  payload: { groupId },
+                });
+              }}
+              onEdit={navigateToEditPage}
+            />
+
+            {/* Toggle */}
+            <div className="flex flex-col items-center gap-4">
+              <div className="bg-white rounded-full border border-slate-200 p-1 shadow-sm flex">
+                <button
+                  onClick={() => onToggleClick("posts")}
+                  className={`px-8 py-2 rounded-full text-sm font-medium transition ${
+                    toggle === "posts"
+                      ? "bg-indigo-800 text-white shadow-md"
+                      : "text-slate-600 hover:bg-slate-100"
+                  }`}
+                >
+                  Posts
+                </button>
+
+                <button
+                  onClick={() => onToggleClick("members")}
+                  className={`px-8 py-2 rounded-full text-sm font-medium transition ${
+                    toggle === "members"
+                      ? "bg-indigo-800 text-white shadow-md"
+                      : "text-slate-600 hover:bg-slate-100"
+                  }`}
+                >
+                  Members
+                </button>
+              </div>
+
+              <div className="text-sm font-medium text-slate-600">
+                {toggle === "posts"
+                  ? `${posts?.length ?? 0} posts`
+                  : `${members?.length ?? 0} members`}
+              </div>
+            </div>
+
+            {toggle === "posts" ? (
+              <GroupFeedContainer
+                posts={posts}
+                onLike={onLikePost}
+                onDelete={(postId) =>
+                  openConfirm({
+                    type: "delete-post",
+                    payload: { postId },
+                    title: "Delete Post",
+                    message: "Delete this post? This cannot be undone.",
+                  })
+                }
+                onLoadMore={() => onLoadMorePosts(groupId)}
+                hasMore={hasMorePosts}
+                loadingMore={loadingMorePosts}
+                onPostClick={(postId) => onPostClick(postId)}
+              />
+            ) : (
+              <MemberContainer
+                members={members}
+                isAdmin={isAdmin}
+                onRemove={({ memberId }) =>
+                  openConfirm({
+                    type: "remove-member",
+                    payload: { memberId },
+                    title: "Remove member",
+                    message:
+                      "Are you sure you want to remove this member from the group?",
+                  })
+                }
+                onMakeAdmin={({ memberId }) =>
+                  openConfirm({
+                    type: "make-admin",
+                    payload: { memberId },
+                    title: "Make admin",
+                    message:
+                      "Are you sure you want to make this member an admin?",
+                  })
+                }
+                onRemoveFromAdmin={({ memberId }) =>
+                  openConfirm({
+                    type: "remove-from-admin",
+                    payload: { memberId },
+                    title: "Remove admin",
+                    message:
+                      "Are you sure you want to remove admin privileges for this user?",
+                  })
+                }
+                onProfileClick={onProfileClick}
+                onLoadMore={() =>
+                  onLoadMoreMembers({ groupId, currentMemberPage })
+                }
+                hasMore={hasMoreMembers}
+                loadingMore={loadingMoreMembers}
+                isMemberAdmin={({ memberId }) => isMemberAdmin({ memberId })}
+              />
+            )}
+          </div>
+
+          {/* DESKTOP LAYOUT */}
+          <div className="hidden lg:grid lg:grid-cols-12 lg:gap-12">
+            {/* LEFT SIDEBAR */}
+            <div className="lg:col-span-4">
+              <GroupPageHeader
+                group={group}
+                isMember={isMember}
+                isAdmin={isAdmin}
+                isOnlyAdmin={isOnlyAdmin}
+                onJoin={() => onJoin()}
+                onAdminClick={() => onAdminClick()}
+                onNewPost={navigateToCreatePost}
+                onReviewPost={navigateToReviewPost}
+                onLeave={() => {
+                  openConfirm({
+                    type: "leave-group",
+                    title: "Leave Group",
+                    message: "Are you sure you want to leave this group?",
+                    payload: { groupId },
+                  });
+                }}
+                onDelete={() => {
+                  openConfirm({
+                    type: "delete-group",
+                    title: "Delete Group",
+                    message:
+                      "Are you sure you want to delete this group? This action cannot be undone!",
+                    payload: { groupId },
+                  });
+                }}
+                onEdit={navigateToEditPage}
+              />
+            </div>
+
+            {/* RIGHT CONTENT */}
+            <div className="lg:col-span-8 space-y-6">
+              {/* Toggle */}
+              <div className="flex items-center justify-between">
+                <div className="bg-white rounded-full border border-slate-200 p-1 shadow-sm flex">
+                  <button
+                    onClick={() => onToggleClick("posts")}
+                    className={`px-6 py-2 rounded-full text-sm font-medium transition ${
+                      toggle === "posts"
+                        ? "bg-indigo-800 text-white shadow-md"
+                        : "text-slate-600 hover:bg-slate-100"
+                    }`}
+                  >
+                    Posts
+                  </button>
+
+                  <button
+                    onClick={() => onToggleClick("members")}
+                    className={`px-6 py-2 rounded-full text-sm font-medium transition ${
+                      toggle === "members"
+                        ? "bg-indigo-800 text-white shadow-md"
+                        : "text-slate-600 hover:bg-slate-100"
+                    }`}
+                  >
+                    Members
+                  </button>
+                </div>
+
+                <div className="text-sm font-medium text-slate-600">
+                  {toggle === "posts"
+                    ? `${posts?.length ?? 0} posts`
+                    : `${members?.length ?? 0} members`}
+                </div>
+              </div>
+
+              {toggle === "posts" ? (
+                <GroupFeedContainer
+                  posts={posts}
+                  onLike={onLikePost}
+                  onDelete={(postId) =>
+                    openConfirm({
+                      type: "delete-post",
+                      payload: { postId },
+                      title: "Delete Post",
+                      message: "Delete this post? This cannot be undone.",
+                    })
+                  }
+                  onLoadMore={() => onLoadMorePosts(groupId)}
+                  hasMore={hasMorePosts}
+                  loadingMore={loadingMorePosts}
+                  onPostClick={(postId) => onPostClick(postId)}
+                />
+              ) : (
+                <MemberContainer
+                  members={members}
+                  isAdmin={isAdmin}
+                  onRemove={({ memberId }) =>
+                    openConfirm({
+                      type: "remove-member",
+                      payload: { memberId },
+                      title: "Remove member",
+                      message:
+                        "Are you sure you want to remove this member from the group?",
+                    })
+                  }
+                  onMakeAdmin={({ memberId }) =>
+                    openConfirm({
+                      type: "make-admin",
+                      payload: { memberId },
+                      title: "Make admin",
+                      message:
+                        "Are you sure you want to make this member an admin?",
+                    })
+                  }
+                  onRemoveFromAdmin={({ memberId }) =>
+                    openConfirm({
+                      type: "remove-from-admin",
+                      payload: { memberId },
+                      title: "Remove admin",
+                      message:
+                        "Are you sure you want to remove admin privileges for this user?",
+                    })
+                  }
+                  onProfileClick={onProfileClick}
+                  onLoadMore={() =>
+                    onLoadMoreMembers({ groupId, currentMemberPage })
+                  }
+                  hasMore={hasMoreMembers}
+                  loadingMore={loadingMoreMembers}
+                  isMemberAdmin={({ memberId }) => isMemberAdmin({ memberId })}
+                />
+              )}
+            </div>
+          </div>
+
+          {/* Global components */}
+          <AdminContainer
+            isOpen={isOpenAdmin}
+            onClose={onCloseAdmin}
+            admins={admins}
+            onLoadMore={() => onLoadMoreAdmins({ groupId })}
+            hasMore={hasMoreAdmins}
+            loadingMore={loadingMoreAdmins}
+            onProfileClick={onProfileClick}
+            onRemoveFromAdmin={({ memberId }) =>
+              onRemoveAdmin({ groupId, memberId })
+            }
             isAdmin={isAdmin}
-            isOnlyAdmin={isOnlyAdmin}
-            onJoin={() => onJoin()}
-            onAdminClick={() => onAdminClick()}
-            onNewPost={navigateToCreatePost}
-            onReviewPost={navigateToReviewPost}
-            onLeave={() => {
-              openConfirm({
-                type: "leave-group",
-                title: "Leave Group",
-                message: "Are you sure you want to leave this group?",
-                payload: { groupId },
-              });
+          />
+
+          <ConfirmModal
+            isOpen={confirmState.isOpen}
+            title={confirmState.title}
+            message={confirmState.message}
+            onCancel={closeConfirm}
+            onConfirm={async () => {
+              try {
+                const handler = getConfirmHandler();
+                if (typeof handler === "function") {
+                  const result = handler();
+                  if (result && typeof result.then === "function") {
+                    await result;
+                  }
+                }
+              } catch (err) {
+                console.error("Confirm action failed:", err);
+              } finally {
+                closeConfirm();
+              }
             }}
-            onDelete={() => {
-              openConfirm({
-                type: "delete-group",
-                title: "Delete Group",
-                message:
-                  "Are you sure you want to delete this group? This action cannot be undone!",
-                payload: { groupId },
-              });
-            }}
-            onEdit={navigateToEditPage}
           />
         </div>
-
-        {/* Toggle */}
-        <div className="mt-6 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => onToggleClick("posts")}
-              className={`px-4 py-2 rounded-full text-sm transition font-medium ${
-                toggle === "posts"
-                  ? "bg-indigo-600 text-white shadow-md"
-                  : "bg-white/70 backdrop-blur text-indigo-700 hover:bg-indigo-100"
-              }`}
-            >
-              Posts
-            </button>
-
-            <button
-              onClick={() => onToggleClick("members")}
-              className={`px-4 py-2 rounded-full text-sm transition font-medium ${
-                toggle === "members"
-                  ? "bg-rose-500 text-white shadow-md"
-                  : "bg-white/70 backdrop-blur text-rose-600 hover:bg-rose-100"
-              }`}
-            >
-              Members
-            </button>
-          </div>
-
-          <div className="text-sm font-medium text-slate-600">
-            {toggle === "posts"
-              ? `${posts?.length ?? 0} posts`
-              : `${members?.length ?? 0} members`}
-          </div>
-        </div>
-
-        {/* Main content */}
-        <div className="mt-5">
-          {toggle === "posts" ? (
-            <GroupFeedContainer
-              posts={posts}
-              onLike={onLikePost}
-              onDelete={(postId) =>
-                openConfirm({
-                  type: "delete-post",
-                  payload: { postId },
-                  title: "Delete Post",
-                  message: "Delete this post? This cannot be undone.",
-                })
-              }
-              onLoadMore={() => onLoadMorePosts(groupId)}
-              hasMore={hasMorePosts}
-              loadingMore={loadingMorePosts}
-              onPostClick={(postId) => onPostClick(postId)}
-            />
-          ) : (
-            <MemberContainer
-              members={members}
-              isAdmin={isAdmin}
-              onRemove={({ memberId }) =>
-                openConfirm({
-                  type: "remove-member",
-                  payload: { memberId },
-                  title: "Remove member",
-                  message:
-                    "Are you sure you want to remove this member from the group?",
-                })
-              }
-              onMakeAdmin={({ memberId }) =>
-                openConfirm({
-                  type: "make-admin",
-                  payload: { memberId },
-                  title: "Make admin",
-                  message:
-                    "Are you sure you want to make this member an admin?",
-                })
-              }
-              onRemoveFromAdmin={({ memberId }) =>
-                openConfirm({
-                  type: "remove-from-admin",
-                  payload: { memberId },
-                  title: "Remove admin",
-                  message:
-                    "Are you sure you want to remove admin privileges for this user?",
-                })
-              }
-              onProfileClick={onProfileClick}
-              onLoadMore={() =>
-                onLoadMoreMembers({ groupId, currentMemberPage })
-              }
-              hasMore={hasMoreMembers}
-              loadingMore={loadingMoreMembers}
-              isMemberAdmin={({ memberId }) =>
-                isMemberAdmin({ memberId })
-              }
-            />
-          )}
-        </div>
-
-        {/* Admin container */}
-        <AdminContainer
-          isOpen={isOpenAdmin}
-          onClose={onCloseAdmin}
-          admins={admins}
-          onLoadMore={() => onLoadMoreAdmins({ groupId })}
-          hasMore={hasMoreAdmins}
-          loadingMore={loadingMoreAdmins}
-          onProfileClick={onProfileClick}
-          onRemoveFromAdmin={({ memberId }) =>
-            onRemoveAdmin({ groupId, memberId })
-          }
-          isAdmin={isAdmin}
-        />
-
-        {/* Confirm modal */}
-        <ConfirmModal
-          isOpen={confirmState.isOpen}
-          title={confirmState.title}
-          message={confirmState.message}
-          onCancel={closeConfirm}
-          onConfirm={async () => {
-            try {
-              const handler = getConfirmHandler();
-              if (typeof handler === "function") {
-                const result = handler();
-                if (result && typeof result.then === "function") {
-                  await result;
-                }
-              }
-            } catch (err) {
-              console.error("Confirm action failed:", err);
-            } finally {
-              closeConfirm();
-            }
-          }}
-        />
       </div>
-    </div>
-  </HomeLayout>
-);
-
+    </HomeLayout>
+  );
 }
-
 
 export default GroupPage;

@@ -87,118 +87,145 @@ function EditGroupPage() {
 
     
     return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-        <form
-            onSubmit={handleSubmit}
-            className="w-full max-w-5xl bg-white border border-gray-200 rounded-2xl p-10 flex gap-12"
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-indigo-900 to-[#2E2A8C] px-4 py-12">
+    <form
+      onSubmit={handleSubmit}
+      className="w-full max-w-5xl bg-white border border-slate-200 rounded-2xl shadow-[0_25px_40px_-10px_rgba(0,0,0,0.45)] overflow-hidden"
+    >
+      {/* HEADER */}
+      <div className="px-10 pt-8 pb-6 border-b border-slate-200">
+        <h1 className="text-2xl font-semibold text-slate-900">
+          Edit Group
+        </h1>
+        <p className="text-sm text-slate-500 mt-1">
+          Manage your group information for your campus community.
+        </p>
+      </div>
+
+      {/* BODY */}
+      <div className="flex flex-col md:flex-row px-10 py-8 gap-10">
+
+        {/* LEFT: IMAGE */}
+        <div className="md:w-1/3 flex flex-col items-center">
+          <h3 className="text-sm font-semibold text-slate-700 mb-6">
+            Change Group Icon
+          </h3>
+
+          <div className="w-44 h-44 rounded-full overflow-hidden border border-slate-200 bg-slate-100 flex items-center justify-center mb-5">
+            {previewIcon ? (
+              <img
+                src={previewIcon}
+                alt="Group icon"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="text-slate-400 text-sm">
+                No image
+              </span>
+            )}
+          </div>
+
+          <label className="cursor-pointer w-full">
+            <span className="block text-center px-4 py-2.5 rounded-lg bg-indigo-900 text-white text-sm font-medium hover:bg-indigo-800 transition">
+              Change Picture
+            </span>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={onIconChange}
+              hidden
+            />
+          </label>
+
+          <p className="text-xs text-slate-400 mt-3 text-center">
+            Recommended: square image, minimum 300×300 px
+          </p>
+        </div>
+
+        {/* RIGHT: FORM */}
+        <div className="md:w-2/3 flex flex-col gap-6">
+
+          {/* Group Name */}
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-slate-700">
+              Group Name
+              <span className="text-slate-400 font-normal">
+                {" "} (public name visible to everyone)
+              </span>
+            </label>
+
+            <input
+              type="text"
+              name="name"
+              value={userInput.name}
+              onChange={onInputChange}
+              placeholder="e.g. Campus Web Developers"
+              className="border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-900 focus:border-indigo-900 transition"
+            />
+          </div>
+
+          {/* Category */}
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-slate-700">
+              Category
+              <span className="text-slate-400 font-normal">
+                {" "} (helps people discover your group)
+              </span>
+            </label>
+
+            <input
+              type="text"
+              name="category"
+              value={userInput.category}
+              onChange={onInputChange}
+              placeholder="e.g. Web Development, AI, College Club"
+              className="border border-slate-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-900 focus:border-indigo-900 transition"
+            />
+          </div>
+
+          {/* Description */}
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-slate-700">
+              Description
+              <span className="text-slate-400 font-normal">
+                {" "} (what is this group about?)
+              </span>
+            </label>
+
+            <textarea
+              name="description"
+              value={userInput.description}
+              onChange={onInputChange}
+              placeholder="Write a short description explaining the purpose of this group"
+              rows={5}
+              className="border border-slate-200 rounded-lg px-4 py-3 text-sm outline-none resize-none focus:ring-2 focus:ring-indigo-900 focus:border-indigo-900 transition"
+            />
+          </div>
+
+        </div>
+      </div>
+
+      {/* FOOTER ACTIONS */}
+      <div className="flex justify-end gap-4 px-10 py-6 border-t border-slate-200">
+
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="px-6 py-2.5 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100 transition text-sm"
         >
-            {/* LEFT: ICON */}
-            <div className="w-1/3 flex flex-col items-center gap-6">
-                <div className="w-44 h-44 rounded-full overflow-hidden border border-gray-300 bg-gray-100 flex items-center justify-center">
-                    {previewIcon ? (
-                        <img
-                            src={previewIcon}
-                            alt="Group icon"
-                            className="w-full h-full object-cover"
-                        />
-                    ) : (
-                        <span className="text-gray-400 text-sm">
-                            No image
-                        </span>
-                    )}
-                </div>
+          Cancel
+        </button>
 
-                <label className="cursor-pointer text-sm font-medium text-blue-600 hover:underline">
-                    Upload / Change icon
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={onIconChange}
-                        hidden
-                    />
-                </label>
+        <button
+          type="submit"
+          className="px-7 py-2.5 rounded-lg bg-indigo-900 text-white font-medium hover:bg-indigo-800 transition text-sm shadow-[0_20px_25px_-5px_rgba(0,0,0,0.2)]"
+        >
+          Save
+        </button>
 
-                <p className="text-xs text-gray-500 text-center">
-                    Recommended: square image, minimum 300×300 px
-                </p>
-            </div>
-
-            {/* RIGHT: FORM FIELDS */}
-            <div className="w-2/3 flex flex-col gap-6">
-                {/* Group Name */}
-                <div className="flex flex-col gap-1">
-                    <label className="text-sm font-semibold text-gray-700">
-                        Group Name
-                        <span className="text-gray-400 font-normal">
-                            {" "} (public name visible to everyone)
-                        </span>
-                    </label>
-                    <input
-                        type="text"
-                        name="name"
-                        value={userInput.name}
-                        onChange={onInputChange}
-                        placeholder="e.g. Campus Web Developers"
-                        className="border border-gray-300 rounded-lg px-4 py-2 outline-none focus:border-blue-500"
-                    />
-                </div>
-
-                {/* Category */}
-                <div className="flex flex-col gap-1">
-                    <label className="text-sm font-semibold text-gray-700">
-                        Category
-                        <span className="text-gray-400 font-normal">
-                            {" "} (helps people discover your group)
-                        </span>
-                    </label>
-                    <input
-                        type="text"
-                        name="category"
-                        value={userInput.category}
-                        onChange={onInputChange}
-                        placeholder="e.g. Web Development, AI, College Club"
-                        className="border border-gray-300 rounded-lg px-4 py-2 outline-none focus:border-blue-500"
-                    />
-                </div>
-
-                {/* Description */}
-                <div className="flex flex-col gap-1">
-                    <label className="text-sm font-semibold text-gray-700">
-                        Description
-                        <span className="text-gray-400 font-normal">
-                            {" "} (what is this group about?)
-                        </span>
-                    </label>
-                    <textarea
-                        name="description"
-                        value={userInput.description}
-                        onChange={onInputChange}
-                        placeholder="Write a short description explaining the purpose of this group"
-                        rows={5}
-                        className="border border-gray-300 rounded-lg px-4 py-3 outline-none resize-none focus:border-blue-500"
-                    />
-                </div>
-
-                {/* ACTIONS */}
-                <div className="mt-4 flex gap-4">
-                    <button
-                        type="button"
-                        onClick={() => navigate(-1)}
-                        className="px-6 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 transition"
-                    >
-                        Cancel
-                    </button>
-
-                    <button
-                        type="submit"
-                        className="px-7 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition"
-                    >
-                        Save changes
-                    </button>
-                </div>
-            </div>
-        </form>
-    </div>
+      </div>
+    </form>
+  </div>
 );
 
 

@@ -12,25 +12,41 @@ function ConfirmModal({
   return createPortal(
   <>
     {/* ================= MOBILE ================= */}
-    <div className="lg:hidden fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[9999] px-4">
+    <div className="lg:hidden fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[9999] px-4">
       
-      <div className="bg-white w-full max-w-sm p-5 rounded-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.08)]">
+      <div className="bg-white w-full max-w-md p-7 rounded-2xl shadow-[0_20px_25px_-5px_rgb(0_0_0_/_0.1)]">
         
-        <p className="text-sm text-gray-700 leading-relaxed">
+        <p className="text-base text-slate-700 leading-relaxed">
           {message}
         </p>
 
-        <div className="mt-6 flex flex-col gap-3">
+        <div className="mt-8 flex flex-col gap-4">
           
           <button
-            className="w-full py-2.5 rounded-full text-sm font-medium bg-[#FF6B35] text-white active:scale-[0.98] transition-transform"
+            className="
+              w-full py-3
+              rounded-lg
+              text-sm font-semibold
+              text-white
+              bg-gradient-to-b from-indigo-900 to-indigo-800
+              hover:from-indigo-800 hover:to-indigo-700
+              transition-all duration-200
+            "
             onClick={onConfirm}
           >
             Yes
           </button>
 
           <button
-            className="w-full py-2.5 rounded-full text-sm font-medium text-[#064E3B] bg-gray-100 active:scale-[0.98] transition-transform"
+            className="
+              w-full py-3
+              rounded-lg
+              text-sm font-medium
+              text-slate-600
+              border border-slate-200
+              hover:bg-slate-50
+              transition-all duration-200
+            "
             onClick={onCancel}
           >
             No
@@ -41,25 +57,41 @@ function ConfirmModal({
     </div>
 
     {/* ================= DESKTOP ================= */}
-    <div className="hidden lg:flex fixed inset-0 bg-black/30 backdrop-blur-sm items-center justify-center z-[9999] px-4">
+    <div className="hidden lg:flex fixed inset-0 bg-black/40 backdrop-blur-sm items-center justify-center z-[9999] px-4">
       
-      <div className="bg-white w-full max-w-sm p-6 rounded-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:scale-[1.01] transition-transform duration-200">
+      <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-[0_20px_25px_-5px_rgb(0_0_0_/_0.1)]">
         
-        <p className="text-sm text-gray-700 leading-relaxed">
+        <p className="text-base text-slate-700 leading-relaxed">
           {message}
         </p>
 
-        <div className="mt-6 flex justify-end gap-3">
+        <div className="mt-8 flex justify-end gap-4">
           
           <button
-            className="px-4 py-2 rounded-full text-sm font-medium text-[#064E3B] hover:bg-gray-100 transition-colors"
+            className="
+              px-5 py-2.5
+              rounded-lg
+              text-sm font-medium
+              text-slate-600
+              border border-slate-200
+              hover:bg-slate-50
+              transition-all duration-200
+            "
             onClick={onCancel}
           >
             No
           </button>
 
           <button
-            className="px-4 py-2 rounded-full text-sm font-medium bg-[#FF6B35] text-white hover:opacity-90 transition-all"
+            className="
+              px-5 py-2.5
+              rounded-lg
+              text-sm font-semibold
+              text-white
+              bg-gradient-to-b from-indigo-900 to-indigo-800
+              hover:from-indigo-800 hover:to-indigo-700
+              transition-all duration-200
+            "
             onClick={onConfirm}
           >
             Yes
@@ -72,7 +104,6 @@ function ConfirmModal({
   </>,
   document.body
 );
-
 
 }
 

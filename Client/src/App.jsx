@@ -21,6 +21,9 @@ import { useEffect } from "react";
 import { fetchCurrentUser } from "../Redux/Slices/AuthSlice.js";
 import EditGroupPage from "./pages/community/EditGroupPage.jsx";
 import socket from "./socket.js";
+import CampusLoader from "./components/Loader/CampusLoader.jsx";
+import { useState } from "react";
+import ScrollManager from "./components/Utils/ScrollManager.jsx";
 
 function App() {
   const dispatch = useDispatch();
@@ -37,9 +40,26 @@ function App() {
     }
   }, [user]);
 
+    const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // simulate checking auth / restoring session
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <CampusLoader />;
+  }
+
   return (
     <BrowserRouter>
-      {/* VANTA BACKGROUND — mounted ONCE */}
+      
+      <ScrollManager />
+
 
       <Routes>
         <Route path="/" element={<Home />} />
